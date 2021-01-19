@@ -1,0 +1,48 @@
+<div class="w-full">
+  <%= for {date, sessions} <- @sessions do %>
+    <div class="mb-4">
+      <div class="mb-6">
+        <p class="py-2"><%= date(date) %></p>
+        <p class="text-lg font-semibold text-gray-600 uppercase"><%= day(date) %></p>
+      </div>
+      <%= for session <- sessions do %>
+        <%= if @should_route do %>
+          <%= live_redirect class: "", to: Routes.events_session_dashboard_path(@socket, :dashboard, @event.slug, session.slug) do %>
+            <div class="flex justify-between px-4 py-2 font-semibold bg-white rounded even:bg-gray-100 hover:bg-gray-100">
+              <div class="flex">
+                <p><%= time(session.start_datetime, @event.timezone, @user_timezone) %></p>
+                <p class="px-12"><%= session.name %></p>
+              </div>
+              <%= case session.status do %>
+                <% status when status in ["connected", "starting"] -> %>
+                  <p class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium leading-5 bg-red-100 text-red-800 ml-2 uppercase">
+                    live
+                  </p>
+
+                <% status when status in ["ready", "initialized"] -> %>
+                  <p class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium leading-5 bg-gray-100 text-gray-800 ml-2 uppercase">
+                    preparing
+                  </p>
+
+                <% "ended" -> %>
+                  <p class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium leading-5 bg-red-100 text-red-800 ml-2 uppercase">
+                    ended
+                  </p>
+
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="flex items-center justify-between px-4 py-2 bg-white rounded even:bg-gray-100 hover:bg-gray-100">
+            <p class="font-semibold text-gray-900"><%= time(session.start_datetime, @event.timezone, @user_timezone) %></p>
+            <p class="font-semibold text-gray-900 truncate"><%= session.name %></p>
+            <%= link to: Routes.events_path(@socket, :calendar, @event.slug, session.slug), class: "group flex" do %>
+              <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "calendar", class: "h-5 w-5 text-gray-500 group-hover:text-gray-700 fill-current" %>
+              <p class="ml-1 text-sm font-semibold text-gray-900">Add To Calendar</p>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

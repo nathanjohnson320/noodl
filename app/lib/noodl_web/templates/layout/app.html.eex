@@ -1,0 +1,10 @@
+<%= if get_flash(@conn, :info) do %>
+  <p class="p-4 text-sm text-center text-gray-800 bg-blue-100 alert alert-info" role="alert"><%= get_flash(@conn, :info) %></p>
+<% end %>
+<%= if get_flash(@conn, :error) do %>
+  <p class="p-4 text-sm text-center text-gray-800 bg-red-100 alert alert-danger" role="alert"><%= get_flash(@conn, :error) %></p>
+<% end %>
+
+<%= @inner_content %>
+
+

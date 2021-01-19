@@ -1,0 +1,157 @@
+<div class="relative bg-white rounded-md shadow">
+  <header class="flex items-center justify-between px-4 py-5 border-b border-gray-200 sm:px-6">
+    <h1 class="text-lg font-medium leading-6 text-gray-900">
+      Recordings
+    </h1>
+
+    <button phx-click="new" type="button" class="<%= UI.button() %>">
+      Add recording
+    </button>
+  </header>
+
+  <div>
+    <%= for session <- @sessions do %>
+      <dl>
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium leading-5 text-gray-500">
+            <%= session.name %>
+          </dt>
+          <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= date_in_exp_time(session.start_datetime, @event) %>
+          </dd>
+        </div>
+
+        <%= if Enum.empty?(session.recordings) do %>
+          <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium leading-5 text-gray-500">
+              No recordings available for this session
+            </dt>
+          </div>
+        <% end %>
+
+        <%= for recording <- session.recordings do %>
+          <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <%= case recording.type do %>
+              <% "youtube" -> %>
+                <dt class="text-sm font-medium leading-5 text-gray-500"></dt>
+
+                <dd class="h-64 mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2" phx-update="ignore">
+                  <iframe
+                    class="w-full h-64"
+                    src="https://www.youtube.com/embed/<%= recording.external_id %>"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen
+                  ></iframe>
+                </dd>
+
+              <% "system" ->  %>
+                <dt class="text-sm font-medium leading-5 text-gray-500">
+                  <%= if recording.status == "converted" do %>
+                    <a class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium leading-5 text-white bg-red-400 border border-transparent rounded-full"
+                       href="<%= Routes.events_path(@socket, :download_recording, @event.slug, recording.id) %>"
+                       download>
+                      Download
+                    </a>
+                  <% else %>
+                    <button class="<%= UI.button() %>"
+                            phx-click="convert"
+                            phx-value-id="<%= recording.id %>"
+                            phx-value-user-id="<%= @user.id %>"
+                    >
+                      Convert to MP4
+                    </button>
+                  <% end %>
+                </dt>
+
+                <dd class="h-64 mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2" phx-update="ignore">
+                  <video
+                    id="<%= recording.id %>-video"
+                    data-url="<%= recording_url(recording) %>"
+                    class="object-fill w-full h-64"
+                    controls
+                    preload="auto"
+                    width="auto"
+                    height="auto"
+                    phx-hook="VideoPlayer"
+                  >
+                  </video>
+                </dd>
+            <% end %>
+          </div>
+        <% end %>
+      </dl>
+    <% end %>
+  </div>
+</div>
+
+<%= if @show_add_modal do %>
+  <div class="fixed inset-x-0 bottom-0 px-4 pb-6 sm:inset-0 sm:p-0 sm:flex sm:items-center sm:justify-center">
+    <div phx-click="cancel" class="fixed inset-0 transition-opacity">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <div
+      class="px-4 pt-5 pb-4 overflow-auto transition-all transform bg-white rounded-lg shadow-xl sm:max-w-xl sm:w-full sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-headline"
+    >
+      <div>
+        <h2 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
+          Add a recording
+        </h2>
+
+        <div class="mt-4">
+          <%= form_for @changeset, "#", [phx_submit: "recording_submit", phx_change: "recording_change", class: "mt-5"], fn f -> %>
+            <%= hidden_input f, :external_id %>
+
+            <div class="pb-6 border-b border-gray-200">
+              <div class="grid grid-cols-6 gap-6 mt-6 mt-6">
+                <div class="col-span-6">
+                  <%= label f, :type do %>
+                    <span class="block text-sm font-medium leading-5 text-gray-700">Video Type <span class="text-xs">*</span></span>
+                    <%= select f, :type, @types, prompt: "Video Type", class: "mt-1 block form-select w-full py-2 px-3 py-0 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5" %>
+                  <% end %>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-6 gap-6 mt-6">
+                <div class="col-span-6">
+                  <%= label f, :url do %>
+                    <span class="block text-sm font-medium leading-5 text-gray-700">URL <span class="text-xs">*</span></span>
+                    <%= text_input f, :url, [placeholder: "https://youtu.be/QJkopba8yyE", class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+                  <% end %>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-6 gap-6 mt-6">
+                <div class="col-span-6">
+                  <%= label f, :session_id do %>
+                    <span class="block text-sm font-medium leading-5 text-gray-700">Session <span class="text-xs">*</span></span>
+                    <%= select f, :session_id, Enum.map(@sessions, &({&1.name, &1.id})), prompt: "Session", class: "mt-1 block form-select w-full py-2 px-3 py-0 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5" %>
+                  <% end %>
+                </div>
+              </div>
+
+
+
+            </div>
+
+            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+              <span class="flex w-full rounded-md shadow-sm sm:col-start-2">
+                <%= submit "Add", class: "inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-500 text-base leading-6 font-medium text-white shadow-sm hover:bg-red-400 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5" %>
+              </span>
+
+              <span class="flex w-full mt-3 rounded-md shadow-sm sm:mt-0 sm:col-start-1">
+                <button type="button" phx-click="cancel" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium leading-6 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue sm:text-sm sm:leading-5">
+                  Cancel
+                </button>
+              </span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

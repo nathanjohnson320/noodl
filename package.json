@@ -1,0 +1,19 @@
+{
+  "name": "noodl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://nas:8888/business/venu.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@pulumi/aws": "^3.8.0",
+    "@pulumi/awsx": "^0.22.0"
+  }
+}

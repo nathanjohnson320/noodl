@@ -1,0 +1,167 @@
+<%= f = form_for @changeset, "#", [phx_submit: @on_submit, phx_change: :validate, class: "mt-5"] %>
+  <div class="pb-6 border-b border-gray-200">
+    <div class="grid grid-cols-6 gap-6">
+      <div class="col-span-6">
+        <%= label f, :name do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">Name <span class="text-xs">*</span></span>
+          <%= text_input f, :name, [placeholder: "My Session", class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+          <%= if @validating and not is_nil(@changeset.errors[:name]) do %>
+            <%= error_tag @changeset, :name, [class: "block mt-2 text-sm text-red-600"] %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-6 gap-6 mt-6">
+      <div class="col-span-6">
+        <%= label f, :description do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">Description</span>
+        <% end %>
+        <%= live_component @socket, MarkdownComponent, id: "description-markdown", f: f, changeset: @changeset, validating: @validating, field: :description %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-6 gap-6 mt-6">
+      <div class="col-span-6">
+        <%= label f, :start_datetime do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">Start Date <span class="text-xs">*</span></span>
+
+          <%= localized_datetime_select f, :start_datetime %>
+        <% end %>
+
+        <%= if @validating and not is_nil(@changeset.errors[:start_datetime]) do %>
+          <%= error_tag @changeset, :start_datetime, [class: "block mt-2 text-sm text-red-600"] %>
+        <% end %>
+      </div>
+
+      <div class="col-span-6">
+        <%= label f, :end_datetime do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">End Date <span class="text-xs">*</span></span>
+
+          <%= localized_datetime_select f, :end_datetime %>
+        <% end %>
+
+        <%= if @validating and not is_nil(@changeset.errors[:end_datetime]) do %>
+          <%= error_tag @changeset, :end_datetime, [class: "block mt-2 text-sm text-red-600"] %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-6 gap-6 mt-6">
+      <div class="col-span-6 sm:col-span-3">
+        <%= label f, :topic do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">Topic <span class="text-xs">*</span></span>
+          <%= text_input f, :topic, [placeholder: "Software Development", class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+          <%= if @validating and not is_nil(@changeset.errors[:topic]) do %>
+            <%= error_tag @changeset, :topic, [class: "block mt-2 text-sm text-red-600"] %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="col-span-6 mt-6 sm:col-span-3 sm:mt-0">
+        <%= label f, :audience do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">Audience <span class="text-xs">*</span></span>
+          <%= text_input f, :audience, [placeholder: "Beginner", class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+          <%= if @validating and not is_nil(@changeset.errors[:audience]) do %>
+            <%= error_tag @changeset, :audience, [class: "block mt-2 text-sm text-red-600"] %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-6 mt-6">
+      <div class="col-span-6">
+        <%= label f, :type do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">
+            What type of session will this be?
+            <span class="text-xs">*</span>
+          </span>
+
+          <%= select f,
+          :type,
+          [
+            "Key Note (One presenter, many listeners)": "keynote",
+            "Video Conference (Up to 17 presenters, many viewers)": "video_conference"
+          ],
+          [
+            class: "mt-1 block form-select w-full py-2 px-3 py-0 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5",
+            required: true,
+            prompt: "Select a type"
+          ]
+          %>
+          <%= if @validating and not is_nil(@changeset.errors[:type]) do %>
+            <%= error_tag @changeset, :type, [class: "block mt-2 text-sm text-red-600"] %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-6 mt-6">
+      <div class="col-span-6">
+        <%= label f, :host_id do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">What speaker will be hosting this event? <span class="text-xs">*</span></span>
+          <%= select f,
+          :host_id,
+          @speakers,
+          [
+            class: "mt-1 block form-select w-full py-2 px-3 py-0 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5",
+            required: true,
+            prompt: "Select a host"
+          ]
+          %>
+          <%= if @validating and not is_nil(@changeset.errors[:host_id]) do %>
+            <%= error_tag @changeset, :host_id, [class: "block mt-2 text-sm text-red-600"] %>
+          <% end %>
+          <span class="block mt-2 text-xs font-medium leading-5 text-gray-700">
+            Add speakers by attaching the "speaker" role to members
+            <%= live_redirect "here.", to: Routes.live_path(@socket, Live.Events.Manage, @event.slug, :members), class: "inline-flex items-center border border-transparent text-xs leading-5 font-medium rounded-md text-red-500 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150" %>
+          </span>
+        <% end %>
+      </div>
+    </div>
+    <div class="grid grid-cols-6 gap-6 mt-6">
+      <div class="col-span-6 sm:col-span-3">
+        <%= label f, :spectators do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">Allow Spectators?</span>
+
+          <div class="flex justify-between">
+            <p class="block mt-2 text-xs font-medium leading-5 text-gray-700">
+              Spectators can view a session without logging in.
+            </p>
+            <%= checkbox f, :spectators, [class: "form-checkbox h-4 w-4 text-red-600 transition duration-150 ease-in-out mt-2"] %>
+          </div>
+
+          <%= if @validating and not is_nil(@changeset.errors[:spectators]) do %>
+            <%= error_tag @changeset, :spectators, [class: "block mt-2 text-sm text-red-600"] %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="col-span-6 mt-6 sm:col-span-3 sm:mt-0">
+        <%= label f, :max_spectators do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">Max Spectators</span>
+          <%= number_input f, :max_spectators, [placeholder: "15", class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+          <%= if @validating and not is_nil(@changeset.errors[:max_spectators]) do %>
+            <%= error_tag @changeset, :max_spectators, [class: "block mt-2 text-sm text-red-600"] %>
+          <% end %>
+
+          <span class="block mt-2 text-xs font-medium leading-5 text-gray-700">
+            (leave empty for unlimited spectators)
+          </span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+    <span class="flex w-full rounded-md shadow-sm sm:col-start-2">
+      <%= submit "Save", class: "inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-500 text-base leading-6 font-medium text-white shadow-sm hover:bg-red-400 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5" %>
+    </span>
+
+    <span class="flex w-full mt-3 rounded-md shadow-sm sm:mt-0 sm:col-start-1">
+      <button type="button" phx-click="cancel" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium leading-6 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue sm:text-sm sm:leading-5">
+        Cancel
+      </button>
+    </span>
+  </div>
+</form>

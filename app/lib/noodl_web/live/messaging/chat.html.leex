@@ -1,0 +1,103 @@
+<button phx-click="open_chat" class="absolute top-0 right-0 z-20 mt-4 mr-4 <%= if not @chat_open, do: "visible", else: "hidden" %>">
+  <span class="sr-only">Expand chat</span>
+  <svg class="w-5 h-5 text-red-500 hover:text-red-700" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+</button>
+
+<div
+  class="flex flex-shrink-0 h-full <%= if @chat_open, do: "visible", else: "hidden" %>"
+>
+  <div class="flex flex-col w-full bg-white border border-l border-gray-200 sm:w-64 md:w-86">
+    <div class="flex flex-col flex-1 h-0 overflow-y-auto">
+      <div class="flex items-center justify-between flex-shrink-0 px-4 py-2 border-b border-gray-200 bg-gray-50">
+        <button class="hidden sm:block" type="button" phx-click="close_chat">
+          <span class="sr-only">Close chat</span>
+          <svg class="w-5 h-5 text-gray-500 transform rotate-180 hover:text-gray-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 3a1 1 0 011 1v12a1 1 0 11-2 0V4a1 1 0 011-1zm7.707 3.293a1 1 0 010 1.414L9.414 9H17a1 1 0 110 2H9.414l1.293 1.293a1 1 0 01-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+        </button>
+
+        <button
+          type="button"
+          class="inline-block text-xs font-medium tracking-wide text-gray-600 uppercase"
+          phx-click="change_tab"
+          phx-value-tab="chat"
+        >
+          Session Chat
+        </button>
+
+        <div class="flex items-center">
+          <%= if @user.recording_id != "0" do %>
+            <button type="button" class="block mr-3 sm:hidden">
+              <span class="sr-only">Show Info</span>
+              <svg class="w-5 h-5 text-gray-500 hover:text-gray-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+            </button>
+
+            <%= if FeatureFlags.enabled?(:direct_messaging) do %>
+              <button type="button" phx-click="change_tab" phx-value-tab="messages" class="mr-2">
+                <span class="sr-only">Messages</span>
+                <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "mail", class: "text-gray-500 hover:text-gray-600 h-5 w-5" %>
+              </button>
+            <% end %>
+
+            <button type="button" phx-click="change_tab" phx-value-tab="users">
+              <span class="sr-only">Users in chat</span>
+              <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "users", class: "text-gray-500 hover:text-gray-600 h-5 w-5" %>
+            </button>
+          <% end %>
+        </div>
+      </div>
+      <div class="relative flex-1 px-2 mt-4 bg-white">
+        <%= if @user.recording_id == "0" do %>
+          <div class="h-full text-center flex justify-center items-center align-middle">
+            <div>
+              <p>To join the chat you'll need a ticket.</p>
+              <p>
+                Get one on the <%= live_redirect "event home page", to: Routes.events_show_path(@socket, :show, @session.event.slug), class: "underline" %>
+              </p>
+            </div>
+          </div>
+        <% else %>
+          <%# Show Users in Chat pane %>
+          <%= case @current_tab do %>
+            <% :messages -> %>
+              <%= live_component @socket, NoodlWeb.Live.Messaging.DirectMessaging,
+              id: :direct_messages,
+              users: @users |> non_anonymous_users() |> Enum.filter(&(&1.id != @user.id)),
+              session: @session
+              %>
+
+            <% :direct_message -> %>
+              <%= live_render @socket, NoodlWeb.Live.Messaging.DirectMessage,
+              id: :direct_message,
+              session: %{
+                "to" => @direct_message,
+                "user" => @user,
+                "user_timezone" => @user_timezone
+              }
+              %>
+
+            <% :users -> %>
+              <%= live_component @socket, NoodlWeb.Live.Messaging.UserList,
+              id: :users_list,
+              is_organizer: @is_organizer,
+              presenters: @presenters,
+              organizers: @organizers,
+              users: non_anonymous_users(@users),
+              banned_users: @banned_users,
+              session: @session
+              %>
+
+            <% :chat -> %>
+              <%= live_render @socket, NoodlWeb.Live.Messaging.AudienceChat,
+              id: :audience_chat,
+              session: %{
+                "session" => @session,
+                "user" => @user,
+                "channel_name" => @channel_name,
+                "user_timezone" => @user_timezone
+              }
+              %>
+            <% end %>
+          <% end %>
+      </div>
+    </div>
+  </div>
+</div>

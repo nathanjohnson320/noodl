@@ -1,0 +1,74 @@
+<div class="relative bg-white rounded-md shadow">
+  <header class="flex items-center justify-between px-4 py-5 border-b border-gray-200 sm:px-6">
+    <div>
+      <h1 class="text-lg font-medium leading-6 text-gray-900">
+        Publishing
+      </h1>
+      <p class="max-w-2xl mt-1 text-sm leading-5 text-gray-500">
+        Unpublish your event to remove it from search while you make changes.
+      </p>
+    </div>
+  </header>
+
+  <div>
+    <%= if not @event.is_live do %>
+      <div class="px-3 py-1 mb-8">
+        <div>
+          <%= if not Enum.empty?(@validations.sessions) do %>
+            <h3
+              id="progress-headline"
+              class="pl-3 my-2 text-xs font-semibold leading-4 tracking-wider text-red-500 uppercase"
+            >
+              Sessions with invalid start/end times
+            </h3>
+
+            <%= for session <- @validations.sessions do %>
+              <div class="flex items-center pl-3">
+                <%= live_redirect to: Routes.live_path(@socket, Live.Events.Manage, @event.slug, "schedule"), class: "text-gray-700 w-full flex justify-between py-2 mt-1 font-medium" do %>
+                  <div class="flex items-center text-xs">
+                    <%= Phoenix.View.render NoodlWeb.SharedView, "_hero_icon.html", icon: "edit", class: "h-5 w-5 text-gray-500 fill-current" %>
+                    <p class="ml-2"><%= session.name %></p>
+                  </div>
+
+                  <%= Phoenix.View.render NoodlWeb.SharedView, "_hero_icon.html", icon: "arrow-right", class: "h-4 w-4 text-gray-500 fill-current" %>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+
+          <%= if @validations.tickets > 0 do %>
+            <h3
+              id="progress-headline"
+              class="my-2 text-xs font-semibold leading-4 tracking-wider text-gray-500 uppercase"
+            >
+              <%= @validations.tickets %> invalid tickets (will be automatically updated on publish)
+            </h3>
+          <% end %>
+
+          <%= if @validations.releases > 0 do %>
+            <h3
+              id="progress-headline"
+              class="my-2 text-xs font-semibold leading-4 tracking-wider text-gray-500 uppercase"
+            >
+              <%= @validations.releases %> invalid releases (will be automatically updated on publish)
+            </h3>
+          <% end %>
+        </div>
+
+        <button
+          phx-click="publish"
+          class="<%= UI.button() %> my-5"
+          type="button"
+        >
+          Publish Event
+        </button>
+      </div>
+    <% else %>
+      <div class="flex items-center px-4 py-4 sm:px-6">
+        <button phx-click="unpublish" class="<%= UI.button(:secondary) %>">
+          Unpublish
+        </button>
+      </div>
+    <% end %>
+  </div>
+</div>

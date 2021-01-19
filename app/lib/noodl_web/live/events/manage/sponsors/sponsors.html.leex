@@ -1,0 +1,245 @@
+<div class="relative bg-white rounded-md">
+  <header class="flex items-center justify-around px-4 py-5 sm:px-6">
+    <img src="/images/sponsor.svg" />
+
+    <div>
+      <h1 class="text-xl font-semibold leading-tight text-gray-900 sm:text-3xl">
+        Sponsors
+      </h1>
+
+      <p class="mt-2 text-sm leading-5 text-gray-500 sm:text-base">
+        Display the organizations making this event possible.
+      </p>
+
+      <button phx-click="new" phx-value-type="new" type="button" class="<%= UI.button() %> mt-4">
+        Add sponsor
+      </button>
+    </div>
+  </header>
+
+  <ul>
+    <%= for sponsor <- @sponsors do %>
+      <li
+        class="block border border-white border-solid rounded odd:border-gray-200 odd:bg-gray-100"
+      >
+        <div class="flex items-center px-4 py-4 sm:px-6">
+          <div class="flex items-center flex-1 min-w-0">
+            <div class="flex-1 min-w-0 px-4">
+              <%= if not is_nil(sponsor.image) do %>
+                <div class="flex-shrink-0">
+                  <img class="object-cover w-12 h-auto"
+                       alt="<%= sponsor.name %> photo"
+                       src="<%= sponsor_photo_url(sponsor) %>"
+                  />
+                </div>
+              <% end %>
+
+              <div>
+                <div class="text-sm font-medium leading-5 text-red-600 truncate">
+                  <%= sponsor.name %>
+                </div>
+                <p class="flex items-center mt-2 text-sm leading-5 text-gray-500">
+                  <%= sponsor.description %>
+                </p>
+
+                <p class="flex items-center mt-2 text-sm leading-5 text-gray-500">
+                  <%= link sponsor.link_text || sponsor.external_link, to: sponsor.external_link || "#", rel: "noopener noreferrer", target: "_blank" %>
+                </p>
+              </div>
+            </div>
+          </div>
+          <%= live_component @socket, Popover,
+          id: "#{sponsor.id}-popover",
+          button_classes: "",
+          button_content: action_menu(%{sponsor: sponsor}), sponsor: sponsor do %>
+            <div
+              class="absolute right-0 w-56 origin-top-right rounded-md shadow-lg">
+              <div class="bg-white rounded-md shadow-xs">
+                <div class="py-1">
+                  <button
+                    type="button"
+                    phx-click="edit"
+                    phx-click="edit"
+                    phx-value-id="<%= sponsor.id %>"
+                    class="flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 group hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                  >
+                    <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"/>
+                      <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"/>
+                    </svg>
+                    Edit
+                  </button>
+
+                  <button
+                    type="button"
+                    phx-click="delete"
+                    phx-value-id="<%= sponsor.id %>"
+                    data-confirm="Are you sure?"
+                    class="flex items-center w-full px-4 py-2 text-sm leading-5 text-gray-700 group hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900"
+                  >
+                    <svg class="w-5 h-5 mr-3 text-gray-400 group-hover:text-gray-500 group-focus:text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</div>
+
+<%= if @modal_open do %>
+  <div class="fixed inset-x-0 bottom-0 px-4 pb-6 sm:inset-0 sm:p-0 sm:flex sm:items-center sm:justify-center">
+    <div phx-click="cancel" class="fixed inset-0 transition-opacity">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <div
+      style="height: 500px"
+      class="px-4 pt-5 pb-4 overflow-y-scroll transition-all transform bg-white rounded-lg shadow-xl sm:max-w-lg sm:w-full sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-headline"
+    >
+      <div>
+        <h2 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
+          Manage Sponsors
+        </h2>
+        <%= if live_flash(@flash, :error) do %>
+          <div class="p-4 mt-4 transition-opacity duration-200 ease-in rounded-md bg-red-50">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium leading-5 text-red-800">
+                  <%= live_flash(@flash, :error) %>
+                </p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        <div class="mt-4">
+          <%= form_for @changeset, "#", [phx_submit: :submit, phx_change: :validate, multipart: true, class: "mt-5"], fn f -> %>
+            <div class="pb-6 border-b border-gray-200">
+              <div class="w-full">
+                <%= label f, :name do %>
+                  <span class="block text-sm font-medium leading-5 text-gray-700">Name <span class="text-xs">*</span></span>
+                  <%= text_input f, :name, [placeholder: "Acme Inc.", class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+                  <%= if @validating and not is_nil(@changeset.errors[:name]) do %>
+                    <%= error_tag @changeset, :name, [class: "block mt-2 text-sm text-red-600"] %>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <div class="mt-6">
+                <div class="sm:col-span-6"
+                     phx-drop-target="<%= @uploads.image.ref %>"
+                >
+                  <label class="block text-sm font-medium text-gray-700">
+                    Sponsor Logo
+                  </label>
+                  <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+                    <div class="space-y-1 text-center">
+                      <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                      </svg>
+                      <p class="text-sm text-gray-600">
+                        <button type="button"
+                                phx-hook="Upload"
+                                id="image-upload"
+                                class="bg-white rounded-md font-medium text-red-600 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                          Upload a file
+                        </button>
+                        <%= live_file_input @uploads.image, class: "sr-only" %>
+
+                        or drag and drop
+                      </p>
+                      <p class="text-xs text-gray-500">
+                        PNG, JPG, GIF up to 10MB
+                      </p>
+
+                      <%= if not Enum.empty?(@uploads.image.entries) do %>
+                        <%= for entry <- @uploads.image.entries do %>
+                          <div class="relative">
+                            <button type="button"
+                                    class="absolute rounded-full top-0 bg-white left-0 transform -translate-x-2 -translate-y-2"
+                                    phx-click="remove_image"
+                                    phx-value-ref="<%= entry.ref %>"
+                            >
+                              <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "x-circle", class: "h-5 w-5 text-gray-500 group-hover:text-gray-700" %>
+                            </button>
+
+                            <%= live_img_preview entry, alt: "Cover Photo Thumbnail", class: "mt-4 h-auto w-full" %>
+                          </div>
+                        <% end %>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-6">
+                <%= label f, :description do %>
+                  <span class="block text-sm font-medium leading-5 text-gray-700">Sponsor Description <span class="text-xs">*</span></span>
+                  <%= textarea f, :description, [class: "form-textarea mt-1 block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5", rows: "3"] %>
+                  <%= if @validating and not is_nil(@changeset.errors[:description]) do %>
+                    <%= error_tag @changeset, :description, [class: "block mt-2 text-sm text-red-600"] %>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <div class="mt-6">
+                <%= label f, :company_info do %>
+                  <span class="block text-sm font-medium leading-5 text-gray-700">Company Info</span>
+                  <%= textarea f, :company_info, [class: "form-textarea mt-1 block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5", rows: "3"] %>
+                  <%= if @validating and not is_nil(@changeset.errors[:company_info]) do %>
+                    <%= error_tag @changeset, :company_info, [class: "block mt-2 text-sm text-red-600"] %>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <div class="mt-6">
+                <%= label f, :external_link do %>
+                  <span class="block text-sm font-medium leading-5 text-gray-700">Company URL</span>
+                  <%= text_input f, :external_link, [class: "form-textarea mt-1 block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5", rows: "3"] %>
+                  <%= if @validating and not is_nil(@changeset.errors[:external_link]) do %>
+                    <%= error_tag @changeset, :external_link, [class: "block mt-2 text-sm text-red-600"] %>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <div class="mt-6">
+                <%= label f, :link_text do %>
+                  <span class="block text-sm font-medium leading-5 text-gray-700">Company URL Text</span>
+                  <%= text_input f, :link_text, [class: "form-textarea mt-1 block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5", rows: "3"] %>
+                  <%= if @validating and not is_nil(@changeset.errors[:link_text]) do %>
+                    <%= error_tag @changeset, :link_text, [class: "block mt-2 text-sm text-red-600"] %>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+              <span class="flex w-full rounded-md shadow-sm sm:col-start-2">
+                <%= submit "Save", class: "inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-500 text-base leading-6 font-medium text-white shadow-sm hover:bg-red-400 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5" %>
+              </span>
+              <span class="flex w-full mt-3 rounded-md shadow-sm sm:mt-0 sm:col-start-1">
+                <button type="button" phx-click="cancel" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium leading-6 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue sm:text-sm sm:leading-5">
+                  Cancel
+                </button>
+              </span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+

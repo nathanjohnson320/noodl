@@ -1,0 +1,131 @@
+<%= form_for @changeset, "#", [phx_submit: :submit, phx_change: :validate], fn f -> %>
+  <%= if assigns[:index] do %>
+    <%= hidden_input f, :index, value: @index %>
+  <% end %>
+
+  <div
+    class="pb-6 border-b border-gray-200"
+  >
+    <div class="flex flex-wrap w-full">
+      <label
+        class="flex items-center justify-center flex-1 w-full py-2 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-200 rounded cursor-pointer <%= radio_classes("paid", @changeset) %>"
+      >
+        <span class="text-sm">Paid</span>
+        <%= radio_button f, :pricing_type, "paid", class: "hidden" %>
+      </label>
+
+      <label
+        class="flex items-center justify-center flex-1 w-full py-2 ml-3 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-200 rounded cursor-pointer <%= radio_classes("free", @changeset) %>"
+      >
+        <span class="text-sm">Free</span>
+        <%= radio_button f, :pricing_type, "free", class: "hidden" %>
+      </label>
+    </div>
+    <%= if @validating and not is_nil(@changeset.errors[:pricing_type]) do %>
+      <%= error_tag @changeset, :pricing_type, [class: "capitalize text-sm text-red-600 block mt-2"] %>
+    <% end %>
+
+    <div class="grid grid-cols-6 gap-6 mt-6">
+      <div class="col-span-6">
+        <%= label f, :title do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">Name <span class="text-xs">*</span></span>
+          <%= text_input f, :title, [placeholder: "Early Bird", class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+          <%= if @validating and not is_nil(@changeset.errors[:title]) do %>
+            <%= error_tag @changeset, :title, [class: "text-sm text-red-600 block mt-2"] %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-6 gap-6 mt-6">
+      <div class="col-span-6 sm:col-span-3">
+        <%= label f, :price do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">Price <span class="text-xs">*</span></span>
+          <%= text_input f, :price, [disabled: price_disabled?(@changeset), placeholder: "$29.00", class: price_classes(@changeset)] %>
+          <%= if @validating and not is_nil(@changeset.errors[:price]) do %>
+            <%= error_tag @changeset, :price, [class: "text-sm text-red-600 block mt-2"] %>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="col-span-6 sm:col-span-3">
+        <%= label f, :quantity do %>
+          <span class="block text-sm font-medium leading-5 text-gray-700">Tickets Available <span class="text-xs">*</span></span>
+          <%= number_input f, :quantity, [placeholder: "0", class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+          <%= if @validating and not is_nil(@changeset.errors[:quantity]) do %>
+            <%= error_tag @changeset, :quantity, [class: "text-sm text-red-600 block mt-2"] %>
+          <% end %>
+        <% end %>
+        <p class="mt-2 text-xs text-gray-500">
+          This is how many tickets you can sell.
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-6">
+      <button phx-click="toggle_options"
+              class="text-sm text-gray-900 transition duration-150 hover:underline text-medium hover:text-gray-700"
+              type="button">
+        More Options
+      </button>
+
+      <%= if @show_options do %>
+        <div class="px-6 py-5 mt-4 rounded-md bg-gray-50">
+          <div class="grid grid-cols-6 gap-6">
+            <div class="col-span-6 sm:col-span-3">
+              <%= label f, :default_quantity do %>
+                <span class="block text-sm font-medium leading-5 text-gray-700">Default Quantity</span>
+                <%= number_input f, :default_quantity, [placeholder: "0", class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5", min: 1, max: 1] %>
+                <%= if @validating and not is_nil(@changeset.errors[:default_quantity]) do %>
+                  <%= error_tag @changeset, :default_quantity, [class: "text-sm text-red-600 block mt-2"] %>
+                <% end %>
+              <% end %>
+              <p class="mt-2 text-xs text-gray-500">
+                When a user goes to purchase, they will see this many selected by default.
+              </p>
+            </div>
+
+            <div class="col-span-6 sm:col-span-3">
+              <%= label f, :max_tickets_per_person do %>
+                <span class="block text-sm font-medium leading-5 text-gray-700">User purchase limit</span>
+                <%= number_input f, :max_tickets_per_person, [class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5", min: 1] %>
+                <%= if @validating and not is_nil(@changeset.errors[:max_tickets_per_person]) do %>
+                  <%= error_tag @changeset, :max_tickets_per_person, [class: "text-sm text-red-600 block mt-2"] %>
+                <% end %>
+                <p class="mt-1 text-xs text-gray-500">Leave blank for unlimited.</p>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="w-full mt-6">
+            <%= label f, :description do %>
+              <span class="block text-sm font-medium leading-5 text-gray-700">Description</span>
+              <%= textarea f, :description, [rows: "3", class: "form-textarea mt-1 block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+              <p class="mt-1 text-xs text-gray-500">General description about this ticket.</p>
+              <%= if @validating and not is_nil(@changeset.errors[:description]) do %>
+                <%= error_tag @changeset, :description, [class: "text-sm text-red-600 block mt-2"] %>
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <%= if @error != "" do %>
+    <p class="mt-3 text-xs text-red-500">
+      <%= @error %>
+    </p>
+  <% end %>
+
+  <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+    <span class="flex w-full rounded-md shadow-sm sm:col-start-2">
+      <%= submit "Save", class: "inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-500 text-base leading-6 font-medium text-white shadow-sm hover:bg-red-400 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5" %>
+    </span>
+    <span class="flex w-full mt-3 rounded-md shadow-sm sm:mt-0 sm:col-start-1">
+      <button type="button" phx-click="cancel" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium leading-6 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue sm:text-sm sm:leading-5">
+        Cancel
+      </button>
+    </span>
+  </div>
+<% end %>

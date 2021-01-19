@@ -1,0 +1,28 @@
+<aside class="w-64 mr-0 lg:mr-20">
+  <nav>
+    <%= live_redirect class: get_active_class(assigns, "profile"), to: Routes.live_path(@socket, Live.Accounts.Profile) do %>
+      <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "user", class: get_active_icon_class(assigns, "profile") %>
+      <span class="truncate">Profile</span>
+    <% end %>
+
+    <%= live_redirect class: get_active_class(assigns, "events"), to: Routes.live_path(@socket, Live.Accounts.Events) do %>
+      <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "user_group", class: get_active_icon_class(assigns, "events") %>
+      <span class="truncate">Events</span>
+    <% end %>
+
+    <%= live_redirect class: get_active_class(assigns, "notifications"), to: Routes.live_path(@socket, Live.Accounts.Notifications) do %>
+      <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "bell", class: get_active_icon_class(assigns, "notifications") %>
+      <span class="truncate">Notifications</span>
+    <% end %>
+
+    <%= live_redirect class: get_active_class(assigns, "security"), to: Routes.live_path(@socket, Live.Accounts.Security) do %>
+      <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "lock", class: get_active_icon_class(assigns, "security") %>
+      <span class="truncate">Security</span>
+    <% end %>
+
+    <%= live_redirect class: get_active_class(assigns, "communication"), to: Routes.live_path(@socket, Live.Accounts.Communication) do %>
+      <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "chat_alt_2", class: get_active_icon_class(assigns, "communication") %>
+      <span class="truncate">Communication</span>
+    <% end %>
+  </nav>
+</aside>

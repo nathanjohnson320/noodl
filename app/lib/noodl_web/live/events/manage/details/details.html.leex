@@ -1,0 +1,308 @@
+<div class="overflow-hidden bg-white shadow sm:rounded-lg">
+  <%= if not @editing do %>
+    <header class="flex items-center justify-between px-4 py-5 border-b border-gray-200 sm:px-6">
+      <div>
+        <h1 class="text-lg font-medium leading-6 text-gray-900">
+          Event Details
+        </h1>
+        <p class="max-w-2xl mt-1 text-sm leading-5 text-gray-500">
+          Review and update details about the event.
+        </p>
+      </div>
+
+      <button
+        phx-click="edit"
+        type="button"
+        class="<%= UI.button(:secondary, :sm) %>"
+      >
+        Edit
+      </button>
+    </header>
+
+    <div>
+      <dl>
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium leading-5 text-gray-700">
+            Name
+          </dt>
+          <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @event.name %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium leading-5 text-gray-700">
+            Primary Email
+          </dt>
+          <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @event.contact_email %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium leading-5 text-gray-700">
+            Start Date
+          </dt>
+          <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= pretty_manage_date(@event, @event.start_datetime) %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium leading-5 text-gray-700">
+            End Date
+          </dt>
+          <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= pretty_manage_date(@event, @event.end_datetime) %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium leading-5 text-gray-700">
+            Timezone
+          </dt>
+          <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @event.timezone %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium leading-5 text-gray-700">
+            Language
+          </dt>
+          <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @event.language %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium leading-5 text-gray-700">
+            Website
+          </dt>
+          <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @event.website %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium leading-5 text-gray-700">
+            About
+          </dt>
+          <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= render_markdown(@event.description) %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium leading-5 text-gray-700">
+            Cover Photo
+          </dt>
+          <dd class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <img
+              class="w-auto h-56 object-fit"
+              alt="Event cover photo"
+              src="<%= cover_photo_url(@event) %>"
+            />
+          </dd>
+        </div>
+      </dl>
+    </div>
+  <% else %>
+    <%= f = form_for @changeset, "#", [multipart: true, phx_submit: :submit, phx_change: :validate] %>
+      <header class="flex items-center justify-between px-4 py-5 border-b border-gray-200 sm:px-6">
+        <div>
+          <h1 class="text-lg font-medium leading-6 text-gray-900">
+            Event Details
+          </h1>
+          <p class="max-w-2xl mt-1 text-sm leading-5 text-gray-500">
+            Review and update details about the event.
+          </p>
+        </div>
+
+        <div>
+          <button phx-click="cancel" type="button" class="<%= UI.button(:secondary, :sm) %>">
+            Cancel
+          </button>
+          <%= submit "Save", class: UI.button(:primary, :sm), phx_disable_with: "Saving..." %>
+        </div>
+      </header>
+
+      <div>
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div class="text-sm font-medium leading-5 text-gray-700">
+            <%= label f, :name, "Name" %>
+          </div>
+          <div class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= text_input f, :name, [class: "form-input block w-full sm:w-1/2 py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-red focus:border-red-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+            <%= if @validating and not is_nil(@changeset.errors[:name]) do %>
+              <%= error_tag @changeset, :name, [class: "block mt-2 text-sm text-red-600"] %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div class="text-sm font-medium leading-5 text-gray-700">
+            <%= label f, :contact_email, "Primary Email" %>
+          </div>
+          <div class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= text_input f, :contact_email, [class: "form-input block w-full sm:w-1/2 py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-red focus:border-red-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+            <%= if @validating and not is_nil(@changeset.errors[:contact_email]) do %>
+              <%= error_tag @changeset, :contact_email, [class: "block mt-2 text-sm text-red-600"] %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div class="text-sm font-medium leading-5 text-gray-700">
+            <%= label f, :start_datetime, "Start Date" %>
+          </div>
+          <div class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <div class="col-span-6 sm:col-span-3">
+              <%= localized_datetime_select f, :start_datetime, disabled: @event.is_live %>
+            </div>
+
+            <%= if @validating and not is_nil(@changeset.errors[:start_datetime]) do %>
+              <%= error_tag @changeset, :start_datetime, [class: "block mt-2 text-sm text-red-600"] %>
+            <% end %>
+
+            <%= if @event.is_live do %>
+              <p class="mt-2 text-xs text-red-500">
+                Editing your event start date is disabled after you publish your event.
+                <br /> You can unpublish your event in the settings tab.
+              </p>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div class="text-sm font-medium leading-5 text-gray-700">
+            <%= label f, :end_datetime, "End Date" %>
+          </div>
+          <div class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <div class="col-span-6 sm:col-span-3" phx-update="ignore">
+              <%= localized_datetime_select f, :end_datetime, disabled: @event.is_live %>
+            </div>
+
+            <%= if @validating and not is_nil(@changeset.errors[:end_datetime]) do %>
+              <%= error_tag @changeset, :end_datetime, [class: "block mt-2 text-sm text-red-600"] %>
+            <% end %>
+
+            <%= if @event.is_live do %>
+              <p class="mt-2 text-xs text-red-500"">
+                Editing your event end date is disabled after you publish your event.
+                <br /> You can unpublish your event in the settings tab.
+              </p>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div class="text-sm font-medium leading-5 text-gray-700">
+            <%= label f, :timezone, "Timezone" %>
+          </div>
+          <div class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%=
+              select f,
+              :timezone,
+              timezones(),
+              [
+                class: "form-select",
+                required: true
+              ]
+            %>
+            <%= if @validating and not is_nil(@changeset.errors[:timezone]) do %>
+              <%= error_tag @changeset, :timezone, [class: "block mt-2 text-sm text-red-600"] %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div class="text-sm font-medium leading-5 text-gray-700">
+            <%= label f, :language, "Language" %>
+          </div>
+          <div class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%=
+            select f,
+            :language,
+            languages(),
+            [
+              class: "form-select",
+              required: true
+            ]
+            %>
+            <%= if @validating and not is_nil(@changeset.errors[:language]) do %>
+              <%= error_tag @changeset, :language, [class: "block mt-2 text-sm text-red-600"] %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div class="text-sm font-medium leading-5 text-gray-700">
+            <%= label f, :website, "Website" %>
+          </div>
+          <div class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= text_input f, :website, [placeholder: "www.example.com", class: "form-input block w-full sm:w-1/2 py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:shadow-outline-red focus:border-red-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+            <%= if @validating and not is_nil(@changeset.errors[:website]) do %>
+              <%= error_tag @changeset, :website, [class: "block mt-2 text-sm text-red-600"] %>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div class="text-sm font-medium leading-5 text-gray-700">
+            <%= label f, :description, "Description" %>
+          </div>
+
+          <div class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= live_component @socket, MarkdownComponent, id: "description-markdown", f: f, changeset: @changeset, validating: @validating, field: :description %>
+          </div>
+        </div>
+
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <div class="text-sm font-medium leading-5 text-gray-700">
+            <%= label f, :cover_photo, "Cover Photo" %>
+          </div>
+          <div class="mt-1 text-sm leading-5 text-gray-900 sm:mt-0 sm:col-span-2">
+            <div class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+              <div class="space-y-1 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                  <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <p class="text-sm text-gray-600">
+                  <button type="button"
+                          phx-hook="Upload"
+                          id="cover-photo-upload"
+                          class="bg-white rounded-md font-medium text-red-600 hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                    Upload a file
+                  </button>
+
+                  <%= live_file_input @uploads.cover_photo, class: "sr-only" %>
+                  or drag and drop
+                </p>
+                <p class="text-xs text-gray-500">
+                  PNG, JPG, GIF up to 10MB
+                </p>
+
+                <%= if not Enum.empty?(@uploads.cover_photo.entries) do %>
+                  <%= for entry <- @uploads.cover_photo.entries do %>
+                    <div class="relative">
+                      <button type="button"
+                              class="absolute rounded-full top-0 bg-white left-0 transform -translate-x-2 -translate-y-2"
+                              phx-click="remove_image"
+                              phx-value-ref="<%= entry.ref %>"
+                      >
+                        <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "x-circle", class: "h-5 w-5 text-gray-500 group-hover:text-gray-700" %>
+                      </button>
+
+                      <%= live_img_preview entry, alt: "Cover Photo Thumbnail", class: "mt-4 h-auto w-full" %>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  <% end %>
+</div>

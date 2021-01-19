@@ -1,0 +1,100 @@
+<%= cond do %>
+  <% @submitted -> %>
+    <div class="fixed bottom-0 right-0 z-10 m-2 sm:m-6">
+      <div style="width: 450px" class="max-w-xs sm:max-w-lg">
+        <div class="w-full mx-auto mb-6 bg-white rounded-md shadow-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <p class="text-sm leading-5 text-gray-500">
+              Thank you for your feedback!
+            </p>
+
+            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+              <span class="flex w-full rounded-md shadow-sm sm:col-start-2">
+                <button type="button" phx-click="reset" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium leading-6 text-white transition duration-150 ease-in-out bg-red-500 border border-transparent rounded-md shadow-sm hover:bg-red-400 focus:outline-none focus:border-red-700 focus:shadow-outline-red sm:text-sm sm:leading-5">
+                  Submit Another
+                </button>
+              </span>
+              <span class="flex w-full mt-3 rounded-md shadow-sm sm:mt-0 sm:col-start-1">
+                <button type="button" phx-click="close" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium leading-6 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue sm:text-sm sm:leading-5">
+                  Close
+                </button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end">
+        <button phx-click="toggle_open" class="p-4 transition duration-150 ease-in-out bg-red-500 rounded-full shadow-lg hover:bg-red-400 hover:shadow-xl" type="button">
+          <span class="sr-only">Website feedback</span>
+          <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "chat_alt_2", class: "flex-shrink-0 h-6 w-6 text-white" %>
+        </button>
+      </div>
+    </div>
+  <% not @open -> %>
+    <div class="fixed bottom-0 right-0 m-2 sm:m-6">
+      <button phx-click="toggle_open" class="flex items-center p-4 transition duration-150 ease-in-out bg-red-500 rounded-full shadow-lg hover:bg-red-400 hover:shadow-xl" type="button">
+        <span class="sr-only">Website feedback</span>
+        <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "chat_alt_2", class: "flex-shrink-0 h-6 w-6 text-white" %>
+      </button>
+    </div>
+  <% @open and not @submitted -> %>
+    <div class="fixed bottom-0 right-0 z-10 m-2 sm:m-6">
+      <div style="width: 450px" class="max-w-xs sm:max-w-lg">
+        <div class="w-full mx-auto mb-6 bg-white rounded-md shadow-lg">
+          <div class="px-4 py-5 border-b border-gray-200 sm:px-6">
+            <span class="text-lg font-medium leading-6 text-gray-900">
+              Feedback
+            </span>
+            <p class="mt-1 text-sm leading-5 text-gray-500 ">
+              Find a bug? Want to request a feature? Send us some feedback.
+            </p>
+          </div>
+          <%= form_for @changeset, "#", [phx_submit: :submit, phx_change: :validate, class: "rounded-md", autocomplete: "off"], fn f -> %>
+            <div class="px-4 py-5 sm:p-6">
+              <div>
+                <%= label f, :subject do %>
+                  <span class="block text-sm font-medium leading-5 text-gray-700">Subject</span>
+                  <%= text_input f, :subject, [placeholder: "Subject", class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+                  <%= if @validating and not is_nil(@changeset.errors[:subject]) do %>
+                    <%= error_tag @changeset, :subject, [class: "block mt-2 text-sm text-red-600"] %>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <div class="mt-3">
+                <%= label f, :type do %>
+                  <span class="block text-sm font-medium leading-5 text-gray-700">Type</span>
+                  <%= select f, :type, ["Bug": "bug", "Feature": "feature", "Other": "other"], class: "mt-1 block form-select w-full py-2 px-3 py-0 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5" %>
+                  <%= if @validating and not is_nil(@changeset.errors[:type]) do %>
+                    <%= error_tag @changeset, :type, [class: "block mt-2 text-sm text-red-600"] %>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <div class="mt-3">
+                <%= label f, :description do %>
+                  <span class="block text-sm font-medium leading-5 text-gray-700">Description</span>
+                  <%= textarea f, :description, [class: "form-textarea mt-1 block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5", required: true, rows: "3"] %>
+                  <%= if @validating and not is_nil(@changeset.errors[:description]) do %>
+                    <%= error_tag @changeset, :description, [class: "block mt-2 text-sm text-red-600"] %>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="px-4 py-5 sm:p-6 bg-gray-50 rounded-b-md">
+              <%= submit "Submit", [class: "w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-500 hover:bg-red-400 focus:outline-none focus:border-red-700 focus:shadow-outline-red active:bg-red-700 transition duration-150 ease-in-out"] %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end">
+        <button phx-click="toggle_open" class="p-4 transition duration-150 ease-in-out bg-red-500 rounded-full shadow-lg hover:bg-red-400 hover:shadow-xl" type="button">
+          <span class="sr-only">Website feedback</span>
+          <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "chat_alt_2", class: "flex-shrink-0 h-6 w-6 text-white" %>
+        </button>
+      </div>
+    </div>
+<% end %>

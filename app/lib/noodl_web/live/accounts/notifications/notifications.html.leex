@@ -1,0 +1,88 @@
+
+
+<section class="min-h-screen pt-16 pb-12 bg-gray-100">
+  <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 lg:flex md:justify-between">
+    <%= Phoenix.View.render NoodlWeb.AccountsView, "sidebar.html", Map.put(assigns, :view, "notifications") %>
+
+    <div class="flex-1 mt-8 md:mt-0">
+      <div class="bg-white rounded-md shadow sm:overflow-hidden">
+        <div class="bg-white">
+          <header class="px-4 pt-5 sm:pt-6 sm:px-6">
+            <h1 class="text-lg font-medium leading-6 text-gray-900">
+              Notifications
+            </h1>
+          </header>
+
+          <form phx-change="update" name="notifications" phx-submit="submit" class="mt-6" autocomplete="off">
+            <div class="flex items-center justify-between px-4 border-b border-gray-300 border-solid sm:px-6">
+              <div class="mb-4">
+                <label for="multiselect" class="flex items-center cursor-pointer">
+                  <%= if @is_multi_checked do %>
+                    <input phx-click="multi_select" checked="checked" type="checkbox" id="multiselect" name="multiselect" class="form-checkbox" phx_ignore="update">
+                  <% else %>
+                    <input phx-click="multi_select" type="checkbox" id="multiselect" name="multiselect" class="form-checkbox" phx_ignore="update">
+                  <% end %>
+                  <span class="pl-2 font-medium text-gray-700">Select all</span>
+                </label>
+              </div>
+              <div class="mb-4 text-sm text-gray-700">
+                <%= if @has_checked do %>
+                  <button phx-click="mark_read" class="py-1 pl-2 pr-2 border border-gray-200 border-solid rounded">Mark as read</button>
+                  <button phx-click="delete" class="py-1 pl-2 pr-2 ml-2 border border-gray-200 border-solid rounded">Delete</button>
+                <% end %>
+              </div>
+            </div>
+            <%= if not Enum.empty?(@notifications) do %>
+              <ul>
+                <%= for notification <- @notifications do %>
+                  <label class="block cursor-pointer" for="<%= notification.id %>">
+                    <li class="px-4 py-4 border-b border-gray-200 border-solid cursor-pointer sm:px-6 hover:bg-gray-100">
+                      <div class="flex items-center">
+                        <%= if notification.checked do %>
+                          <input type="checkbox" value="<%= notification.id %>" phx-change="mark_single_checked" checked="checked" id="<%= notification.id %>" name="<%= notification.id %>" class="form-checkbox">
+                        <% else %>
+                          <input type="checkbox" value="<%= notification.id %>" phx-change="mark_single_checked" id="<%= notification.id %>" name="<%= notification.id %>" class="form-checkbox">
+                        <% end %>
+                        <p class="<%= get_notification_classes(notification) %>"><%= notification.content %></p>
+                      </div>
+                      <div class="mt-1 ml-8 text-xs text-gray-500">
+                        <%= format_created_at(notification) %>
+                      </div>
+                    </li>
+                  </label>
+                <% end %>
+              </ul>
+            <% else %>
+              <div class="flex items-center justify-center px-4 py-4 sm:px-6">
+                <div>
+                  <svg class="w-12 h-12 mx-auto text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h10v7h-2l-1 2H8l-1-2H5V5z" clip-rule="evenodd" fill-rule="evenodd"></path>
+                  </svg>
+                  <span class="block mt-1 text-sm text-gray-600">You have no notifications</span>
+                </div>
+              </div>
+            <% end %>
+            <nav class="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 sm:px-6">
+              <div class="hidden sm:block">
+                <p class="text-sm leading-5 text-gray-700">
+                  Showing
+                  of
+                  <span class="font-medium"><%= length(@notifications) %></span>
+                  result(s)
+                </p>
+              </div>
+              <div class="flex justify-between flex-1 sm:justify-end">
+                <%# <a href="#" class="relative inline-flex items-center px-4 py-2 text-sm font-medium leading-5 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700">
+                  Previous
+                </a>
+                <a href="#" class="relative inline-flex items-center px-4 py-2 ml-3 text-sm font-medium leading-5 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 active:bg-gray-100 active:text-gray-700">
+                  Next
+                </a> %>
+              </div>
+            </nav>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

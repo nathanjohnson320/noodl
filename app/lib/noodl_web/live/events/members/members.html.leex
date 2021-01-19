@@ -1,0 +1,57 @@
+<div class="min-h-screen bg-gray-50">
+  <main class="max-w-2xl px-6 mx-auto lg:max-w-6xl">
+    <div class="px-12 pb-6">
+      <nav class="border-b border-gray-200 flex" aria-label="Breadcrumb">
+        <ol class="max-w-screen-xl w-full mx-auto px-4 flex space-x-4 sm:px-6 lg:px-8">
+          <li class="flex">
+            <div class="flex items-center space-x-4">
+              <%= live_redirect @event.name, to: Routes.events_show_path(@socket, :show, @event.slug), class: "text-sm leading-5 font-medium text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out" %>
+            </div>
+          </li>
+
+          <li class="flex">
+            <div class="flex items-center space-x-4">
+              <svg class="flex-shrink-0 w-6 h-full text-gray-200" viewBox="0 0 24 44" preserveAspectRatio="none" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M.293 0l22 22-22 22h1.414l22-22-22-22H.293z" />
+              </svg>
+
+              <%= live_redirect "Members", to: Routes.live_path(@socket, Live.Events.Members, @event.slug), class: "text-sm leading-5 font-medium text-gray-500 hover:text-gray-700 transition duration-150 ease-in-out" %>
+
+            </div>
+          </li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="grid pb-12 pl-12 pr-12 lg:grid-cols-3 lg:gap-16">
+      <div class="hidden lg:block">
+        <aside class="p-8 bg-white rounded-lg stick top-6">
+          <nav>
+            <span class="flex items-center px-3 py-2 text-sm font-medium leading-5 text-gray-600 text-gray-900 transition duration-150 ease-in-out bg-gray-200 rounded-md group">All Members</span>
+          </nav>
+        </aside>
+      </div>
+
+      <div class="col-span-2 bg-white">
+        <h1 class="px-4 py-5 border-b border-gray-200 border-solid rounded sm:px-6">All Members (<%= @total_members %>)</h1>
+
+        <%= for member <- @members do %>
+            <div class="flex w-full p-4 bg-white border-b border-gray-200 border-solid rounded" style="height: 150px">
+                <div class="flex items-center justify-center w-1/4 min-h-full">
+                    <img title="<%= get_username(member) %>'s photo" alt="<%= get_username(member) %>'s photo" src="<%= profile_photo_url(member) %>" class="w-auto h-full rounded" />
+                </div>
+                <div class="w-3/4 pl-4">
+                    <h5 class="font-semibold text-gray-900">
+                        <%= get_username(member) %>
+                    </h5>
+                    <h6 class="text-sm text-gray-600">
+                        User since: <%= user_since(member) %>
+                    </h6>
+                </div>
+            </div>
+        <% end %>
+      </div>
+  </main>
+</div>
+
+<%= render NoodlWeb.LayoutView, "_footer.html", assigns %>

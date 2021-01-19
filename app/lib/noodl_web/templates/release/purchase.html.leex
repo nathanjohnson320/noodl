@@ -1,0 +1,74 @@
+
+
+<section class="h-screen bg-gray-100">
+  <div class="container pt-12 pb-12 pl-4 pr-4 m-auto">
+    <h1 class="text-xl font-bold md:text-3xl">Purchase your tickets for <span class="text-red-500"><%= @event.name %></span></h1>
+    <div class="block mt-4 bg-white rounded shadow md:mt-8 md:flex" style="min-height: 375px;">
+      <%= if !!@can_proceed do %>
+        <div class="p-6 pb-16 " style="flex: 1;">
+          <h2 class="mb-4 text-xl font-medium">Payment Details</h2>
+          <%= form_for :payment, "#", [id: "payment-form", class: "w-full", phx_hook: "Stripe", data_client_secret: @payment_intent.client_secret], fn f -> %>
+            <div class="w-full form-row">
+              <div class="w-full">
+                <label class="block text-gray-700" for="name">
+                  Name on card
+                </label>
+
+                <%= text_input f, :name, [placeholder: "Jane Smith", class: "form-input mt-2 text-sm font-base text-black w-full", phx_update: "ignore"] %>
+              </div>
+
+              <div class="mt-4">
+                <label class="text-gray-700" for="card-element">
+                  Credit or debit card
+                </label>
+
+                <div class="pt-3 pb-3 pl-2 pr-2 mt-2 text-gray-900 bg-white border border-gray-300 border-solid rounded" style="min-height: 44px;" id="card-element" phx-update="ignore"></div>
+                <div class="mt-2 text-red-600" id="card-errors" role="alert"></div>
+              </div>
+            </div>
+
+            <%= if !is_nil(@error_message) do %>
+              <p class="text-red-700"><%= @error_message %></p>
+            <% end %>
+            <div class="mt-2">
+              <%= submit "Pay Now", class: get_purchase_submit_classes(assigns) %>
+            </div>
+          <% end %>
+        </div>
+        <div class="flex-1 p-6 pb-16 border-l border-gray-300 border-solid ">
+          <h2 class="mb-4 text-lg text-gray-700">Order Summary</h2>
+          <div class="flex pb-8 border-b border-gray-300 border-solid">
+            <div class="mr-4" style="flex: 1; max-width: 100px; max-height: 100px;">
+              <img src="<%= cover_photo_url(@event) %>" class="w-full h-full" />
+            </div>
+            <div style="flex: 2.5;"><%= @event.name %></div>
+            <div class="text-right" style="flex: 1;"><%= @release.price %></div>
+          </div>
+          <div class="mt-8">
+            <h5 class="flex justify-between w-full">
+              <span class="text-sm text-gray-500">Subtotal</span>
+              <span class="text-sm text-gray-500"><%= @release.price %></span>
+            </h5>
+            <h5 class="flex justify-between w-full mt-6">
+              <span class="text-gray-900 text-md">Total</span>
+              <span class="text-gray-900 text-md"><%= @release.price %></span>
+            </h5>
+          </div>
+        </div>
+      <% else %>
+        <div class="mt-4">
+          <h3 class="text-xl font-semibold">
+            Oops!
+          </h3>
+          <p class="text-gray-700">It looks like you're ineligible to purchase tickets for this event!</p>
+          <p class="mt-4 font-semibold text-gray-700" style="max-width: 500px;">This usually happens if:</p>
+          <ul class="text-gray-700">
+            <li>1. You've reached the max amount of tickets purchasable by one person.</li>
+            <li>2. The conference is sold out.</li>
+            <li>3. The conference has already ended.</li>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

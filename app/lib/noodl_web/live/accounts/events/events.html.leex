@@ -1,0 +1,215 @@
+
+
+<div class="min-h-screen pt-16 pb-12 bg-gray-100">
+  <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 lg:flex md:justify-between">
+    <%= Phoenix.View.render NoodlWeb.AccountsView, "sidebar.html", Map.put(assigns, :view, "events") %>
+
+    <div class="flex-1 mt-8 md:mt-0">
+      <header>
+        <h1 class="text-lg font-medium leading-6 text-gray-900">
+          Events
+        </h1>
+      </header>
+
+      <%= if not Enum.empty?(@current_created_events) do %>
+      <div class="mt-8 md:flex md:items-center md:justify-between">
+        <div class="flex-1 min-w-0">
+          <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:leading-9 sm:truncate">
+            Created
+          </h2>
+        </div>
+        <div class="flex mt-4 md:mt-0 md:ml-4">
+          <span class="ml-3 rounded-md shadow-sm">
+            <%= live_redirect "Organize", to: Routes.events_new_path(@socket, :new), class: UI.button(:primary, :sm) %>
+          </span>
+        </div>
+      </div>
+      <div class="mt-4 overflow-hidden bg-white rounded-md shadow">
+        <ul>
+          <%= for event <- @current_created_events do %>
+            <li class="border-t border-gray-200 first:border-t-0">
+              <%= live_redirect class: "block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out", to: Routes.live_path(@socket, Live.Events.Manage, event.slug) do %>
+                <div class="flex items-center px-4 py-4 sm:px-6">
+                  <div class="flex items-center flex-1 min-w-0">
+                    <div class="flex items-center flex-1 flex-shrink-0">
+                      <img class="object-contain w-12 h-12 text-xs rounded-full"
+                           src="<%= cover_photo_url(event) %>"
+                           alt="<%= event.name %>"
+                      />
+                      <div class="flex items-center ml-4">
+                        <div>
+                          <div class="flex mx-2 items-center font-medium text-red-500">
+                            <span class="mr-2"><%= event.name %></span>
+
+                            <%= case event.is_live do %>
+                              <% true -> %>
+                                <span class="px-2 py-1 text-xs text-white uppercase bg-red-500 rounded">
+                                  Published
+                                </span>
+
+                              <% false -> %>
+                                <span class="px-2 py-1 text-xs text-white uppercase bg-yellow-500 rounded">
+                                  Drafted
+                                </span>
+                            <% end %>
+                          </div>
+
+                          <div class="mx-2 flex items-center text-sm text-gray-500">
+                            <span class="truncate">
+                              <%= event.topic %>
+                            </span>
+                          </div>
+
+                          <div class="flex flex-wrap mt-2">
+                            <%= for %{role: role} <- event.user_roles do %>
+                              <span class="mx-2 my-1 inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium leading-5 bg-red-100 text-red-800">
+                                <%= role.name %>
+                              </span>
+                            <% end %>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="flex-1 min-w-0 px-4 md:grid md:grid-cols-1 md:gap-2">
+                      <div class="hidden md:block">
+                        <div>
+                          <div class="text-sm leading-5 text-gray-900">
+                            <span class="block text-xs font-medium tracking-wide text-gray-500 uppercase">Start</span>
+                            <%= format_event_start_time(event, user_timezone(@socket)) %>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                </div>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+      <% end%>
+
+      <div class="mt-8 md:flex md:items-center md:justify-between">
+        <div class="flex-1 min-w-0">
+          <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:leading-9 sm:truncate">
+            Attending
+          </h2>
+        </div>
+        <div class="flex mt-4 md:mt-0 md:ml-4">
+          <span class="ml-3 rounded-md shadow-sm">
+            <%= live_redirect "Create an event", to: Routes.events_new_path(@socket, :new), class: UI.button(:primary, :sm) %>
+          </span>
+        </div>
+      </div>
+      <div class="mt-4 overflow-hidden bg-white rounded-md shadow">
+        <%= if not Enum.empty?(@event_tickets) do %>
+        <ul>
+          <%= for event_ticket <- @event_tickets do %>
+            <li class="border-t border-gray-200 first:border-t-0">
+              <%= live_redirect class: "block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out", to: Routes.events_show_path(@socket, :show, event_ticket.event.slug) do %>
+                <div class="flex items-center px-4 py-4 sm:px-6">
+                  <div class="flex items-center flex-1 min-w-0">
+                    <div class="flex-shrink-0">
+                      <img class="object-contain w-12 h-12 text-xs rounded-full" src="<%= cover_photo_url(event_ticket.event) %>" alt="<%= event_ticket.event.name %>" />
+                    </div>
+                    <div class="flex-1 min-w-0 px-4 md:grid md:grid-cols-2 md:gap-4">
+                      <div>
+                        <div class="text-sm font-medium leading-5 text-red-600 truncate"><%= event_ticket.event.name %></div>
+                        <div class="flex items-center text-sm leading-5 text-gray-500">
+                          <span class="truncate"><%= event_ticket.event.topic %></span>
+                        </div>
+
+                        <%= for %{role: role} <- event_ticket.event.user_roles do %>
+                          <span class="mx-2 my-1 inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium leading-5 bg-red-100 text-red-800">
+                            <%= role.name %>
+                          </span>
+                        <% end %>
+                      </div>
+                      <div class="hidden md:block">
+                        <div>
+                          <div class="text-sm leading-5 text-gray-900">
+                            <span class="block text-xs font-medium tracking-wide text-gray-500 uppercase">Start</span>
+                            <%= format_time(event_ticket.event.start_datetime, "%B %e -") %>
+                            <%= format_time(event_ticket.event.end_datetime, "%B %e") %>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                </div>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+        <% else %>
+        <div class="flex items-center justify-center">
+          <div class="px-4 py-4 text-center sm:px-6">
+            <span class="block mt-1 text-sm text-gray-600">You are not attending any events...</span>
+            <span class="inline-flex mt-3 rounded-md shadow-sm">
+              <%= live_redirect "Explore", to: Routes.events_index_path(@socket, :index), class: UI.button(:primary, :sm) %>
+            </span>
+          </div>
+        </div>
+        <% end%>
+      </div>
+
+      <%= if not Enum.empty?(@expired_created_events) do %>
+      <div class="mt-8 md:flex md:items-center md:justify-between">
+        <div class="flex-1 min-w-0">
+          <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:leading-9 sm:truncate">
+            Previously Created
+          </h2>
+        </div>
+      </div>
+      <div class="mt-4 overflow-hidden bg-white rounded-md shadow">
+        <ul>
+          <%= for event <- @expired_created_events do %>
+            <li class="border-t border-gray-200 first:border-t-0">
+              <%= live_redirect class: "block hover:bg-gray-50 focus:outline-none focus:bg-gray-50 transition duration-150 ease-in-out", to: Routes.live_path(@socket, Live.Events.Manage, event.slug, :overview) do %>
+                <div class="flex items-center px-4 py-4 sm:px-6">
+                  <div class="flex items-center flex-1 min-w-0">
+                    <div class="flex-shrink-0">
+                      <img class="object-contain w-12 h-12 text-xs rounded-full" src="<%= cover_photo_url(event) %>" alt="<%= event.name %>" />
+                    </div>
+                    <div class="flex-1 min-w-0 px-4 md:grid md:grid-cols-2 md:gap-4">
+                      <div>
+                        <div class="text-sm font-medium leading-5 text-red-500 truncate"><%= event.name %></div>
+                        <div class="flex items-center text-sm leading-5 text-gray-500">
+                          <span class="truncate"><%= event.topic %></span>
+                        </div>
+                      </div>
+                      <div class="hidden md:block">
+                        <div>
+                          <div class="text-sm leading-5 text-gray-900">
+                            <span class="block text-xs font-medium tracking-wide text-gray-500 uppercase">Ended</span>
+                            <%= format_event_start_time(event, user_timezone(@socket)) %>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div>
+                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                  </div>
+                </div>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+      <% end %>
+    </div>
+  </div>
+</section>

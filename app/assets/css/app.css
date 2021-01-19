@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+#nprogress .bar {
+  background: #e02424;
+}
+
+#nprogress .spinner-icon {
+  border-top-color: #e02424;
+  border-left-color: #e02424;
+}
+
+@responsive {
+  .h-video-full {
+    height: 100vh;
+    max-height: 100vh;
+    box-sizing: border-box;
+
+    /** Navbar height: */
+    margin-top: -72px;
+    padding-top: 72px;
+  }
+}
+
+::selection {
+  @apply bg-red-200;
+}
+
+.error-tag {
+  @apply block font-bold text-blue-500;
+}
+
+.form-input {
+  @apply focus:ring-red-500 focus:border-red-500 block border-gray-300 rounded-md
+}
+
+.form-select {
+  @apply border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500
+}
+
+.form-radio {
+  @apply focus:ring-red-500 text-red-600 border-gray-300
+}
+
+.form-checkbox {
+  @apply focus:ring-red-500 text-red-600 border-gray-300 rounded
+}
+
+.form-textarea {
+  @apply shadow-sm focus:ring-red-500 focus:border-red-500 border-gray-300 rounded-md
+}
+
+

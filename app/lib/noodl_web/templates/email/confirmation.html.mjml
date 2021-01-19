@@ -1,0 +1,45 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-image
+          width="350px"
+          href="<%= NoodlWeb.Endpoint.url() %>"
+          src="<%= NoodlWeb.Endpoint.url() %>/images/logo.png"
+        />
+      </mj-column>
+    </mj-section>
+
+    <mj-section>
+      <mj-column>
+        <mj-divider border-color="#E53E3E" border-width="2px"></mj-divider>
+      </mj-column>
+    </mj-section>
+
+    <mj-section>
+      <mj-column>
+        <mj-text>
+          <h1>Welcome to noodl!</h1>
+        </mj-text>
+
+        <mj-text>
+          <%= link "Click this link to confirm your account", to:
+          full_url(Routes.accounts_path(NoodlWeb.Endpoint, :confirmation, token:
+          @token)) %>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section>
+      <mj-column>
+        <mj-divider border-color="#E53E3E" border-width="2px"></mj-divider>
+        <mj-text>
+          <h3>ABOUT</h3>
+          <p>Noodl aims to make remote events delightfully simple.</p>
+
+          <p>Copyright © 2020</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

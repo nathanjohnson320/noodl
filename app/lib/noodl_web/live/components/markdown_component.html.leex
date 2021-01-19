@@ -1,0 +1,30 @@
+<div>
+  <div class="block">
+    <div class="border-b border-gray-200">
+      <nav class="-mb-px flex space-x-8" aria-label="Tabs">
+        <%= for tab <- @tabs do %>
+          <button type="button"
+                  phx-click="change_tab"
+                  phx-value-tab="<%= tab %>"
+                  phx-target="<%= @myself %>"
+                  class="<%= if tab == @current_tab, do: "text-red-500 border-red-500", else: "text-gray-500 border-transparent hover:border-gray-300" %> focus:outline-none whitespace-nowrap py-2 px-1 border-b-2  font-medium text-sm hover:text-gray-700 ">
+            <%= String.capitalize(tab) %>
+          </button>
+        <% end %>
+      </nav>
+    </div>
+  </div>
+
+  <%= case @current_tab do %>
+    <% "write" -> %>
+      <div class="rounded-md shadow-sm">
+        <%= textarea @f, @field, [class: "form-textarea mt-1 block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5", rows: 4, placeholder: "Markdown supported"] %>
+      </div>
+
+      <%= if @validating and not is_nil(@changeset.errors[@field]) do %>
+        <%= error_tag @changeset, @field, [class: "block mt-2 text-sm text-red-600"] %>
+      <% end %>
+    <% "preview" -> %>
+      <%= render_markdown(Ecto.Changeset.get_field(@changeset, @field) || "") %>
+  <% end %>
+</div>

@@ -1,0 +1,226 @@
+<div class="flex justify-between">
+  <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:leading-9 sm:truncate">
+    Members
+  </h1>
+
+  <button phx-click="new" type="button" class="<%= UI.button() %>">
+    Add member
+  </button>
+</div>
+
+<%= if not Enum.empty?(@members) do %>
+  <form action="#" class="relative my-2" phx-change="filter_users">
+    <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+      <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "search", class: "w-5 h-5 text-gray-400 fill-current" %>
+    </div>
+    <input class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 sm:text-sm transition duration-150 ease-in-out form-input" id="search_name" name="search[name]" placeholder="Search" type="search">
+  </form>
+
+  <div class="flex flex-col mt-2">
+    <div class="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+      <div class="inline-block min-w-full overflow-hidden align-middle shadow sm:rounded-lg">
+        <table class="min-w-full">
+          <thead>
+            <tr>
+              <th class="px-6 py-3 text-xs text-center font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
+                Name
+              </th>
+              <th class="px-6 py-3 text-xs text-center font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
+                Tickets
+              </th>
+              <th class="px-6 py-3 text-xs text-center font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
+                Roles
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white">
+            <%= for user <- filtered_users(@members, @search) do %>
+              <tr phx-click="edit" phx-value-id="<%= user.id %>" class="border-t border-gray-200 first:border-t-0 cursor-pointer hover:bg-gray-100">
+                <td class="px-6 py-4 whitespace-no-wrap w-1/3">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0 w-10 h-10">
+                      <img class="object-cover w-10 h-10 rounded-full" alt="<%= user.firstname %> <%= user.lastname %> profile photo" src="<%= profile_photo_url(user) %>" />
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium leading-5 text-gray-900"><%= user.firstname %> <%= user.lastname %></div>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="px-6 py-4 whitespace-no-wrap w-1/3">
+                  <span class="text-sm leading-5 text-gray-900">
+                    <%= user_tickets(user) %>
+                  </span>
+                </td>
+
+                <td class="px-6 py-4 whitespace-no-wrap flex flex-wrap justify-center">
+                  <%= for %{role: role} <- user.user_roles do %>
+                    <span class="mx-2 my-1 inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium leading-5 bg-red-100 text-red-800">
+                      <%= role.name %>
+                    </span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="flex flex-col mt-4">
+    <div class="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+      <div class="inline-block min-w-full overflow-hidden align-middle border-b border-gray-200 shadow sm:rounded-lg">
+        <table class="min-w-full">
+          <thead>
+            <tr>
+              <th class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
+                Name
+              </th>
+              <th class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50">
+                Ticket
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white">
+            <tr>
+              <td colspan="2" class="px-6 py-4 whitespace-no-wrap">
+                <div class="flex items-center">
+                  <div class="text-sm font-medium leading-5 text-gray-900">
+                    No one has signed up for this event, yet.
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%= if @show_add_modal do %>
+  <div class="fixed inset-x-0 bottom-0 px-4 pb-6 sm:inset-0 sm:p-0 sm:flex sm:items-center sm:justify-center">
+    <div phx-click="cancel" class="fixed inset-0 transition-opacity">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <div
+      class="px-4 pt-5 pb-4 overflow-auto transition-all transform bg-white rounded-lg shadow-xl sm:max-w-xl sm:w-full sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-headline"
+    >
+      <div>
+        <h2 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
+          Add a user
+        </h2>
+        <h4 class="text-sm font-medium text-gray-500">
+          This will grant the user a ticket without them needing to purchase one.
+        </h4>
+
+        <div class="mt-4">
+          <%= form_for :member, "#", [phx_submit: "add_member_submit", phx_change: "add_member_change", class: "mt-5"], fn f -> %>
+            <div class="pb-6 border-b border-gray-200">
+              <div class="grid grid-cols-6 gap-6">
+                <div class="col-span-6">
+                  <%= label f, :email do %>
+                    <span class="block text-sm font-medium leading-5 text-gray-700">Email <span class="text-xs">*</span></span>
+                    <%= email_input f, :email, [placeholder: "member@example.com", class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5"] %>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+              <span class="flex w-full rounded-md shadow-sm sm:col-start-2">
+                <%= submit "Add", class: "inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-500 text-base leading-6 font-medium text-white shadow-sm hover:bg-red-400 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5" %>
+              </span>
+
+              <span class="flex w-full mt-3 rounded-md shadow-sm sm:mt-0 sm:col-start-1">
+                <button type="button" phx-click="cancel" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium leading-6 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue sm:text-sm sm:leading-5">
+                  Cancel
+                </button>
+              </span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+<%= if @show_role_modal do %>
+  <div class="fixed inset-x-0 bottom-0 px-4 pb-6 sm:inset-0 sm:p-0 sm:flex sm:items-center sm:justify-center">
+    <div phx-click="cancel" class="fixed inset-0 transition-opacity">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <div
+      class="px-4 pt-5 pb-4 overflow-auto transition-all transform bg-white rounded-lg shadow-xl sm:max-w-xl sm:w-full sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-headline"
+    >
+      <div>
+        <h2 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
+          Edit "<%= get_username(@selected_user) %>"
+        </h2>
+
+        <%= if live_flash(@flash, :error) do %>
+          <div class="p-4 mt-4 transition-opacity duration-200 ease-in rounded-md bg-red-50">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium leading-5 text-red-800">
+                  <%= live_flash(@flash, :error) %>
+                </p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+
+        <div class="mt-4">
+          <%= form_for :member, "#", [phx_submit: "member_submit", phx_change: "member_change", class: "mt-5"], fn f -> %>
+            <div class="pb-6 border-b border-gray-200">
+              <div class="flex flex-wrap w-full">
+                <%= for role <- @roles do %>
+                  <%= label [class: "w-full flex my-3"] do %>
+                    <div class="flex items-center justify-center mr-2">
+                      <%= checkbox f, role.id, [class: "form-checkbox", checked: role_checked(@selected_user, role.id, @new_roles)] %>
+                    </div>
+
+                    <div>
+                      <span class="block font-medium leading-5 text-gray-700">
+                        <%= String.capitalize(role.name) %>
+                      </span>
+                      <span class="block text-sm leading-5 text-gray-700">
+                        <%= role.description %>
+                      </span>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+              <span class="flex w-full rounded-md shadow-sm sm:col-start-2">
+                <%= submit "Save", class: "inline-flex justify-center w-full rounded-md border border-transparent px-4 py-2 bg-red-500 text-base leading-6 font-medium text-white shadow-sm hover:bg-red-400 focus:outline-none focus:border-red-700 focus:shadow-outline-red transition ease-in-out duration-150 sm:text-sm sm:leading-5" %>
+              </span>
+
+              <span class="flex w-full mt-3 rounded-md shadow-sm sm:mt-0 sm:col-start-1">
+                <button type="button" phx-click="cancel" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium leading-6 text-gray-700 transition duration-150 ease-in-out bg-white border border-gray-300 rounded-md shadow-sm hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue sm:text-sm sm:leading-5">
+                  Cancel
+                </button>
+              </span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

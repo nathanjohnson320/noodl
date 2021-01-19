@@ -1,0 +1,57 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-image
+          width="350px"
+          href="<%= NoodlWeb.Endpoint.url() %>"
+          src="<%= NoodlWeb.Endpoint.url() %>/images/logo.png"
+        />
+      </mj-column>
+    </mj-section>
+
+    <mj-section>
+      <mj-column>
+        <mj-divider border-color="#E53E3E" border-width="2px"></mj-divider>
+      </mj-column>
+    </mj-section>
+
+    <mj-section>
+      <mj-column>
+        <mj-text>
+          <h1>
+            Congratulations! You have been added to the event "<%=
+            @event.name %>"
+          </h1>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section>
+      <mj-column>
+        <mj-text>
+          <p>
+            You've been granted the following roles: <%= Enum.join(@roles, ", ")
+            %>
+          </p>
+
+          <%= link "View the event here.", to:
+          full_url(Routes.events_show_path(NoodlWeb.Endpoint, :show,
+          @event.slug)) %>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+
+    <mj-section>
+      <mj-column>
+        <mj-divider border-color="#E53E3E" border-width="2px"></mj-divider>
+        <mj-text>
+          <h3>ABOUT</h3>
+          <p>Noodl aims to make remote events delightfully simple.</p>
+
+          <p>Copyright © 2020</p>
+        </mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml>

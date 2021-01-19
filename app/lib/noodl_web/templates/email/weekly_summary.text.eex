@@ -1,0 +1,7 @@
+This week on Noodl TV...
+
+<%= for event <- @events do %>
+<%= event.name %>
+
+<%= event.description %>
+<% end %>

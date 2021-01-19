@@ -1,0 +1,80 @@
+<%= form_for @changeset, "#", [phx_submit: :submit, phx_change: :validate], fn f -> %>
+  <%= label f, :title, class: "flex flex-col mb-6 w-3/4" do %>
+    <span class="text-sm font-bold text-gray-500">Title</span>
+    <%= text_input f, :title, [placeholder: "", class: "form-input mt-2"] %>
+    <%= if @validating and not is_nil(@changeset.errors[:title]) do %>
+      <%= error_tag @changeset, :title, [class: "text-sm text-red-500"] %>
+    <% end %>
+  <% end %>
+
+  <%= label f, :topic, class: "flex flex-col mb-6 w-1/2" do %>
+    <span class="text-sm font-bold text-gray-500">Topic</span>
+    <%= text_input f, :topic, [placeholder: "", class: "form-input mt-2"] %>
+    <%= if @validating and not is_nil(@changeset.errors[:topic]) do %>
+      <%= error_tag @changeset, :topic, [class: "text-sm text-red-500"] %>
+    <% end %>
+  <% end %>
+
+  <%= label f, :audience, class: "flex flex-col mb-6 w-1/2" do %>
+    <span class="text-sm font-bold text-gray-500">Intended Audience</span>
+    <%= text_input f, :audience, [placeholder: "", class: "form-input mt-2"] %>
+    <%= if @validating and not is_nil(@changeset.errors[:audience]) do %>
+      <%= error_tag @changeset, :audience, [class: "text-sm text-red-500"] %>
+    <% end %>
+  <% end %>
+
+  <%= label f, :description, class: "flex flex-col mb-6 w-1/2" do %>
+    <span class="text-sm font-bold text-gray-500">Description</span>
+    <%= textarea f, :description, [placeholder: "", class: "form-input mt-2"] %>
+    <%= if @validating and not is_nil(@changeset.errors[:description]) do %>
+      <%= error_tag @changeset, :description, [class: "text-sm text-red-500"] %>
+    <% end %>
+  <% end %>
+
+  <%= label f, :notes, class: "flex flex-col mb-6 w-full" do %>
+    <span class="text-sm font-bold text-gray-500">Notes</span>
+    <%= textarea f, :notes, [placeholder: "", class: "form-input mt-2"] %>
+    <%= if @validating and not is_nil(@changeset.errors[:notes]) do %>
+      <%= error_tag @changeset, :notes, [class: "text-sm text-red-500"] %>
+    <% end %>
+  <% end %>
+
+  <%= label f, :raw_tags, class: "flex flex-col mb-6 w-1/2" do %>
+    <span class="text-sm font-bold text-gray-500">Tags</span>
+    <%= text_input f, :raw_tags, [placeholder: "comma, separated, words", class: "form-input mt-2"] %>
+    <%= if @validating and not is_nil(@changeset.errors[:tags]) do %>
+      <%= error_tag @changeset, :tags, [class: "text-sm text-red-500"] %>
+    <% end %>
+  <% end %>
+
+  <div class="mt-12 mb-6">
+    <h3 class="text-xl font-bold text-gray-800">Company</h3>
+    <p class="text-gray-500">Information about the company you represent. Optional.</h2>
+  </div>
+
+  <%= label f, :company_name, class: "flex flex-col mb-6 w-1/2" do %>
+    <span class="text-sm font-bold text-gray-500">Company Name</span>
+    <%= text_input f, :company_name, [class: "form-input mt-2"] %>
+    <%= if @validating and not is_nil(@changeset.errors[:company_name]) do %>
+      <%= error_tag @changeset, :company_name, [class: "text-sm text-red-500"] %>
+    <% end %>
+  <% end %>
+
+  <%= label f, :company_description, class: "flex flex-col mb-6 w-full" do %>
+    <span class="text-sm font-bold text-gray-500">Company Description</span>
+    <%= textarea f, :company_description, [class: "form-input mt-2"] %>
+    <%= if @validating and not is_nil(@changeset.errors[:company_description]) do %>
+      <%= error_tag @changeset, :company_description, [class: "text-sm text-red-500"] %>
+    <% end %>
+  <% end %>
+
+  <%= if @validating and not is_nil(@changeset.errors[:user_id]) do %>
+    <%= error_tag @changeset, :user_id, [class: "text-sm text-red-500"] %>
+  <% end %>
+
+  <div class="flex justify-between mt-10">
+    <%= live_redirect "Cancel", to: Routes.events_show_path(@socket, :show, @event.slug), class: UI.button(:secondary) %>
+
+    <%= submit "Send Proposal", class: UI.button() %>
+  </div>
+<% end %>

@@ -1,0 +1,48 @@
+<div class="absolute inset-0 z-50 w-full p-2 overflow-y-scroll bg-white">
+  <span class="font-semibold font-sm font-gray-900">
+    Stream Viewers
+  </span>
+  <ul class="mt-2">
+    <%= for user <- @users do %>
+      <%= if is_organizer?(%{user_id: user.id}, @organizers) do %>
+        <li class="w-full p-2 mb-1 text-sm bg-red-100 rounded">
+          <%= get_username(user) %> <span class="pl-2 text-xs font-semibold text-red-500">Organizer</span>
+        </li>
+      <% else %>
+        <li class="flex items-center w-full p-2 mb-1 text-sm">
+          <%= if @is_organizer and @session.type == "video_conference" and not MapSet.member?(@presenters, user.id) do %>
+            <%= if within_allowed_time?(@session, Timex.now(@session.event.timezone)) do %>
+              <button class="mr-2" phx-click="add_presenter" phx-value-id="<%= user.id %>">
+                <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "user_add", class: "w-4 h-4" %>
+              </button>
+            <% end %>
+          <% end %>
+
+          <%= if @is_organizer and @session.type == "video_conference" and MapSet.member?(@presenters, user.id) do %>
+            <button class="mr-2" phx-click="remove_presenter" phx-value-id="<%= user.id %>">
+              <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "user_remove", class: "w-4 h-4" %>
+            </button>
+          <% end %>
+
+          <%= if @is_organizer and !user_banned?(user, @banned_users) do %>
+            <button class="mr-2" phx-click="kick" phx-value-id="<%= user.id %>">
+              <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "ban", class: "w-4 h-4" %>
+            </button>
+          <% end %>
+
+          <%= if @is_organizer and user_banned?(user, @banned_users) do %>
+            <button class="mr-2" phx-click="unban" phx-value-id="<%= user.id %>">
+              <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "circle_check", class: "w-4 h-4" %>
+            </button>
+          <% end %>
+
+          <%= get_username(user) %>
+
+          <%= if user_banned?(user, @banned_users) do %>
+            <span class="pl-2 text-xs font-semibold text-red-600">Banned</span>
+          <% end %>
+        </li>
+      <% end %>
+    <% end %>
+  </ul>
+</div>

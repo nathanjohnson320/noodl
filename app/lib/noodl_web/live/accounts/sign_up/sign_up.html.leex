@@ -1,0 +1,86 @@
+<div class="flex flex-col justify-center min-h-screen py-12 bg-gray-50 sm:px-6 lg:px-8">
+  <section class="sm:mx-auto sm:w-full sm:max-w-md">
+    <%= live_redirect class: "", to: Routes.live_path(@socket, Live.Pages.Index), style: "height: 30px;" do %>
+      <img class="w-32 mx-auto" src="<%= Routes.static_path(@socket, "/images/logo.png") %>" alt="Noodl">
+    <% end %>
+
+    <h1 class="mt-6 text-3xl font-extrabold leading-9 text-center text-gray-900">
+      Sign up for an account
+    </h1>
+    <p class="mt-2 text-sm leading-5 text-center text-gray-600 max-w">
+      Already have an account?
+      <%= live_redirect "Sign In", to: Routes.accounts_login_path(@socket, :login), class: "font-medium text-red-500 transition duration-150 ease-in-out hover:text-red-400 focus:outline-none focus:underline" %>
+    </p>
+  </section>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="px-4 py-8 bg-white rounded-lg shadow sm:px-10">
+      <%= form_for @changeset, "#", [phx_change: :validate, autocomplete: "off"], fn f -> %>
+        <%= if live_flash(@flash, :info) do %>
+          <div class="p-4 mb-4 text-blue-800 bg-blue-200 border-l-4 border-blue-500" role="alert" phx-click="lv:clear-flash" phx-value-key="info">
+            <%= live_flash(@flash, :info) %>
+          </div>
+        <% end %>
+
+        <%= if live_flash(@flash, :error) do %>
+          <div class="p-4 mb-4 text-red-700 bg-red-100 border-l-4 border-red-500" role="alert" phx-click="lv:clear-flash" phx-value-key="error">
+            <%= live_flash(@flash, :error) %>
+          </div>
+        <% end %>
+
+        <div class="mt-6">
+          <%= label f, :email, class: "block text-sm font-medium leading-5 text-gray-700" do %>
+            Email address
+          <% end %>
+          <div class="mt-1 rounded-md shadow-sm">
+            <%= email_input f, :email, [class: "form-input w-full"] %>
+          </div>
+          <%= if @validating and not is_nil(@changeset.errors[:email]) do %>
+            <%= error_tag @changeset, :email, [class: "text-sm text-red-500"] %>
+          <% end %>
+        </div>
+
+        <div class="mt-6">
+          <%= label f, :password, class: "block text-sm font-medium leading-5 text-gray-700" do %>
+            Password
+          <% end %>
+          <div class="mt-1 rounded-md shadow-sm">
+            <%= password_input f, :password, [class: "form-input w-full", value: @changeset.changes[:password]] %>
+          </div>
+          <%= if @validating and not is_nil(@changeset.errors[:password]) do %>
+            <%= error_tag @changeset, :password, [class: "text-sm text-red-500"] %>
+          <% end %>
+        </div>
+
+        <div class="mt-6">
+          <%= label f, :password_confirmation, class: "block text-sm font-medium leading-5 text-gray-700" do %>
+            Confirm Password
+          <% end %>
+          <div class="mt-1 rounded-md shadow-sm">
+            <%= password_input f, :password_confirmation, [class: "form-input w-full", value: @changeset.changes[:password_confirmation]] %>
+          </div>
+          <%= if @validating and not is_nil(@changeset.errors[:password_confirmation]) do %>
+            <%= error_tag @changeset, :password_confirmation, [class: "text-sm text-red-500"] %>
+          <% end %>
+        </div>
+
+        <div class="flex items-stretch mt-6">
+          <%= checkbox f, :agree_terms, class: "form-checkbox text-red-500 mt-1" %>
+          <%= label f, :agree_terms, class: "ml-2 block text-sm leading-5 text-gray-900" do %>
+            Creating an account means you're okay with our
+            <%= live_redirect "Terms and Conditions", to: Routes.live_path(@socket, Live.Pages.TermsAndConditions), class: "font-medium text-red-500 hover:text-red-400 focus:outline-none focus:underline transition ease-in-out duration-150" %> and
+            <%= live_redirect "Privacy Policy", to: Routes.live_path(@socket, Live.Pages.PrivacyPolicy), class: "font-medium text-red-500 hover:text-red-400 focus:outline-none focus:underline transition ease-in-out duration-150" %>.
+          <% end %>
+        </div>
+
+        <div class="mt-6">
+          <span class="block w-full rounded-md shadow-sm">
+            <%= submit "Sign Up", [class: "w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-red-500 hover:bg-red-400 focus:outline-none focus:border-red-700 focus:shadow-outline-red active:bg-red-700 transition duration-150 ease-in-out"] %>
+          </span>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<%= render NoodlWeb.LayoutView, "_footer.html", assigns %>

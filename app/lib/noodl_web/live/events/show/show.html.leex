@@ -1,0 +1,292 @@
+<div class="bg-gray-100">
+  <div class="py-8 sm:py-10 lg:py-10">
+    <div class="px-2 mx-auto max-w-7xl sm:px-4 lg:px-8">
+      <div class="bg-white rounded-md shadow">
+        <div class="px-4 py-5 sm:p-6">
+          <header class="mx-auto text-center list-insidemax-w-3xl lg:max-w-none">
+            <span class="text-base font-semibold leading-6 tracking-wider text-gray-400 uppercase">
+              <%= @event.topic %>
+            </span>
+            <h1 class="mt-2 text-3xl font-extrabold leading-9 text-gray-900 sm:text-4xl sm:leading-10 lg:text-5xl lg:leading-none">
+              <%= @event.name %>
+            </h1>
+          </header>
+
+          <div aria-hidden="true" class="hidden mx-auto w-36 sm:block">
+            <div class="py-6">
+              <div class="border-4 border-t border-red-500"></div>
+            </div>
+          </div>
+
+          <div class="max-w-lg mx-auto">
+            <div class="text-center">
+              <span class="block text-base font-semibold leading-5 text-gray-700 capitalize">
+                <%= @event.creator.firstname %> <%= @event.creator.lastname %>
+              </span>
+              <span class="block text-sm font-semibold leading-5 text-gray-500">
+                <%= pretty_event_date(@event, user_timezone(@socket)) %>
+              </span>
+            </div>
+
+            <%= if !is_nil(@event.cover_photo) do %>
+              <div class="mt-14">
+                <div class="relative flex justify-center">
+                  <img
+                    class="absolute top-0 z-20 object-cover w-20 h-20 -mt-10 border-2 border-white rounded-full shadow-inner bg-gray-50"
+                    alt="<%= @event.creator.firstname %> profile photo"
+                    src="<%= profile_photo_url(@event.creator) %>"
+                  />
+                  <div style="min-height: 340px" class="relative flex items-center justify-center">
+                    <img
+                      class="z-10 w-full max-w-3xl rounded-md"
+                      alt="Event cover photo"
+                      src="<%= cover_photo_url(@event) %>"
+                    />
+                    <svg class="absolute right-0 hidden lg:block full-right lg:-mr-36" width="200" height="260" fill="none" viewBox="0 0 200 260">
+                      <defs>
+                        <pattern id="5d0dd344-b041-4d26-bec4-8d33ea57ec9b" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                          <rect x="0" y="0" width="4" height="4" class="text-gray-300" fill="currentColor" />
+                        </pattern>
+                      </defs>
+                      <rect width="200" height="260" fill="url(#5d0dd344-b041-4d26-bec4-8d33ea57ec9b)" />
+                    </svg>
+
+                    <svg class="absolute left-0 hidden lg:block lg:-ml-32 full-left" width="200" height="260" fill="none" viewBox="0 0 200 260">
+                      <defs>
+                        <pattern id="5d0dd344-b041-4d26-bec4-8d33ea57ec9b" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                          <rect x="0" y="0" width="4" height="4" class="text-gray-300" fill="currentColor" />
+                        </pattern>
+                      </defs>
+                      <rect width="200" height="260" fill="url(#5d0dd344-b041-4d26-bec4-8d33ea57ec9b)" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            <% else %>
+              <div class="flex justify-center mt-4">
+                <img
+                  class="object-cover w-20 h-20 border-2 border-white rounded-full shadow-inner"
+                  alt="<%= @event.creator.firstname %> profile photo"
+                  src="<%= profile_photo_url(@event.creator) %>"
+                />
+              </div>
+            <% end %>
+
+            <div class="block mt-8 text-center md:items-center md:justify-center md:flex">
+              <%= if does_release_exist?(@event) and Enum.empty?(@user_tickets) and not is_creator?(@user, @event) do %>
+                <span class="block rounded-full shadow-sm md:inline-flex">
+                  <%= link "Get Tickets", to: "#purchase", class: UI.button(:primary, :lg) %>
+                </span>
+              <% end %>
+            </div>
+
+            <%= if not Enum.empty?(@user_tickets) || is_creator?(@user, @event) do %>
+              <div class="block mt-4 text-center md:items-center md:justify-center md:flex">
+                <span class="inline-flex rounded-md shadow-sm">
+                  <%= live_redirect "Join", to: Routes.events_session_dashboard_path(@socket, :dashboard, @event.slug, List.first(@event.sessions).slug), class: UI.button(:primary, :lg) %>
+                </span>
+              </div>
+            <% end %>
+
+            <div class="block mt-4 text-center md:items-center md:justify-center md:flex">
+              <span class="inline-flex rounded-md shadow-sm">
+                <%= link to: Routes.events_path(@socket, :calendar, @event.slug), class: UI.button(:secondary) do %>
+                    <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "calendar", class: "text-gray-500 fill-current -ml-1 mr-3 h-5 w-5" %>
+                    Add To Calendar
+                <% end %>
+              </span>
+            </div>
+
+            <section class="mt-16">
+              <h2 class="text-2xl font-bold text-gray-800">About</h2>
+
+              <p class="text-gray-600 whitespace-pre-line">
+                <%= render_markdown(@event.description) %>
+              </p>
+            </section>
+
+            <section class="mt-16">
+              <div class="flex justify-between w-full">
+                <h2 class="text-2xl font-bold text-gray-800">Speakers</h2>
+                <%= if not event_ended?(@event) do %>
+                  <%= live_redirect to: Routes.live_path(@socket, Live.Events.Proposal.New, @event.slug), class: UI.button(:secondary) do %>
+                    Submit a Talk
+                  <% end %>
+                <% end %>
+              </div>
+
+              <div class="flex flex-wrap justify-between w-full mt-4">
+                <%= if Enum.empty?(@speakers) do %>
+                  <p class="text-gray-500">No speakers have signed up for this event.</p>
+                <% else %>
+                <ul class="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4">
+                  <%= for speaker <- @speakers do %>
+                    <li class="flex flex-col col-span-1 text-center bg-gray-100 rounded">
+                      <div class="flex flex-col flex-1 p-2">
+                        <img class="flex-shrink-0 object-cover w-16 h-16 mx-auto mt-3 bg-black rounded-full shadow-inner" src="<%= if not is_nil(speaker.social_link), do: gravatar_url(speaker), else: profile_photo_url(speaker) %>" alt="<%= speaker.firstname %>" title="<%= speaker.firstname %>">
+                        <p class="mt-3 text-sm font-medium leading-5 text-gray-900 capitalize">
+                          <%= speaker.firstname %> <%= speaker.lastname %>
+                        </p>
+                        <%= unless is_nil(speaker.social_link) do %>
+                          <a
+                            href="<%= speaker.social_link %>"
+                            class="block mt-1 text-sm leading-5 text-blue-600"
+                            rel="noopener noreferrer"
+                            target="_blank"
+                          >
+                            <%= speaker.social_username %>
+                          </a>
+                        <% end %>
+                      </div>
+                    </li>
+                  <% end %>
+                </ul>
+                <% end %>
+              </div>
+            </section>
+
+            <section class="mt-16">
+              <h2 class="text-2xl font-bold text-gray-800">Schedule</h2>
+
+              <%= if Enum.empty?(@event.sessions) do %>
+                <p class="text-gray-500">The organizers of this event are still defining the schedule. Check back soon!</p>
+              <% end %>
+
+              <%= Phoenix.View.render NoodlWeb.EventsView, "schedule_partial.html", [event: @event, sessions: @sessions, should_route: true, socket: @socket, user_timezone: user_timezone(@socket)] %>
+            </section>
+
+            <section class="mt-16">
+              <div class="flex justify-between w-full">
+                <h2 class="text-2xl font-bold text-gray-800">Sponsors</h2>
+              </div>
+
+              <%= if Enum.empty?(@event.sponsors) do %>
+                <p class="text-gray-500">No sponsors have backed this event.</p>
+              <% end %>
+              <ul class="grid grid-cols-2 gap-6 mt-4 sm:grid-cols-3 md:grid-cols-4">
+                <%= for sponsor <- @event.sponsors do %>
+                  <li class="flex flex-col col-span-1 text-center rounded">
+                    <div class="flex flex-col justify-end flex-1 p-2">
+                      <img class="object-cover w-auto" src="<%= sponsor_photo_url(sponsor) %>" alt="<%= sponsor.name %>" title="<%= sponsor.name %>">
+                      <p class="mt-3 text-sm font-medium leading-5 text-gray-900 capitalize"><%= sponsor.name %></p>
+                    </div>
+                  </li>
+                <% end %>
+              </ul>
+            </section>
+
+            <section class="mt-16">
+              <div class="flex justify-between w-full">
+                <h2 class="flex items-center justify-between w-full text-2xl font-bold text-gray-800">
+                  <span>Members (<%= @members_count %>)</span>
+
+                  <%= if not Enum.empty?(@members) do %>
+                    <%= live_redirect to: Routes.live_path(@socket, Live.Events.Members, @event.slug), class: UI.button(:secondary) do %>
+                      View All
+                    <% end %>
+                  <% end %>
+                </h2>
+              </div>
+
+              <%= if Enum.empty?(@members) do %>
+                <p class="text-gray-500">No one has signed up for this event yet.</p>
+              <% end %>
+              <ul class="grid grid-cols-2 gap-6 mt-4 sm:grid-cols-3 md:grid-cols-4">
+                <%= for member <- @members do %>
+                  <li class="flex flex-col col-span-1 text-center bg-gray-100 rounded">
+                    <div class="flex flex-col flex-1 p-2">
+                      <img class="flex-shrink-0 object-cover w-16 h-16 mx-auto mt-3 bg-black rounded-full shadow-inner" src="<%= profile_photo_url(member) %>" alt="<%= member.firstname %>" title="<%= member.firstname %>">
+                      <p class="mt-3 text-sm font-medium leading-5 text-gray-900 capitalize"><%= member.firstname %></p>
+                    </div>
+                  </li>
+                <% end %>
+              </ul>
+            </section>
+
+            <section class="mt-16">
+              <div class="flex justify-between w-full">
+                <h2 class="flex items-center justify-between w-full text-2xl font-bold text-gray-800">
+                  <span>Recordings</span>
+
+                  <%= if not Enum.empty?(@recordings) do %>
+                    <%= live_redirect "View all", to: Routes.live_path(@socket, Live.Events.Recordings, @event.slug), class: UI.button(:secondary) %>
+                  <% end %>
+                </h2>
+              </div>
+
+              <%= if Enum.empty?(@recordings) do %>
+                <p class="text-gray-500">No recordings available.</p>
+              <% end %>
+              <ul class="flex">
+                <%= for recording <- @recordings do %>
+                  <li phx-update="ignore" class="w-1/2 mx-2 my-1">
+                    <%= case recording.type do %>
+                      <% "youtube" -> %>
+                        <iframe
+                          class="w-full h-64"
+                          src="https://www.youtube.com/embed/<%= recording.external_id %>"
+                          frameborder="0"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowfullscreen
+                        ></iframe>
+
+                      <% "system" ->  %>
+                        <video
+                          id="<%= recording.id %>-video"
+                          data-url="<%= Noodl.Events.recording_url(recording) %>"
+                          class="object-fill w-full h-64"
+                          controls
+                          preload="auto"
+                          width="auto"
+                          height="auto"
+                          phx-hook="VideoPlayer"
+                        >
+                        </video>
+                      <% end %>
+                  </li>
+                <% end %>
+              </ul>
+            </section>
+
+            <%= if not event_ended?(@event) do %>
+              <section class="mt-16">
+                <h2 id="purchase" class="text-2xl font-bold text-gray-800">Tickets</h2>
+
+                <div class="mt-4">
+                  <%= if Enum.empty?(@releases) do %>
+                    <p class="text-gray-500">There are no tickets for sale yet. Check back later!</p>
+                  <% else %>
+                    <form class="w-full mb-8" phx-submit="add_to_cart" phx-change="update_cart" action="#">
+                      <%= for {_, release} <- @releases do %>
+                        <div class="flex items-center justify-between w-full px-8 py-2 bg-white rounded odd:bg-gray-100">
+                          <div>
+                            <p class="text-xl font-semibold"><%= release.title %></p>
+                            <p class=""><%= release.description %></p>
+                          </div>
+
+                          <div class="flex items-center">
+                            <p class="text-xl font-bold"><%= release.price %></p>
+                            <span class="mx-4">x</span>
+                            <input class="w-16 form-input" type="number" name="<%= release_name(release) %>" value="<%= release.default_quantity %>" min="1" max="<%= release.max_tickets_per_person %>" />
+                          </div>
+                        </div>
+                      <% end %>
+
+                      <div class="justify-end w-full mt-5 md:flex">
+                        <span class="inline-flex rounded-md shadow-sm">
+                          <%= submit ticket_text(@cart, @releases), class: UI.button(:primary, :lg) %>
+                        </span>
+                      </div>
+                    </form>
+                  <% end %>
+                </div>
+              </section>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%= render NoodlWeb.LayoutView, "_footer.html", assigns %>

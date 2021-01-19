@@ -1,0 +1,189 @@
+<div class="min-h-screen pt-12 pb-24 bg-gray-50 sm:px-6 lg:px-8">
+  <section class="block h-full max-w-screen-lg mx-auto md:flex">
+      <div class="w-full h-full px-6 py-4 bg-white rounded md:w-1/2">
+        <h1 class="mb-3 text-base font-extrabold text-red-500">Noodl 101</h1>
+        <hr />
+        <div class="mt-3">
+          <ul>
+            <li><a class="text-sm font-semibold font-gray-500" href="#getting-started">Getting Started</a></li>
+            <li class="mt-1"><a class="text-sm font-semibold font-gray-500" href="#navigating">Navigating the dashboard</a></li>
+            <li class="mt-1"><a class="text-sm font-semibold font-gray-500" href="#sessions">Creating sessions</a></li>
+            <li class="mt-1"><a class="text-sm font-semibold font-gray-500" href="#chat">Chat usage</a></li>
+            <li class="mt-1"><a class="text-sm font-semibold font-gray-500" href="#streaming">Streaming</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="w-3/4 p-4 ml-5">
+        <div id="getting-started">
+          <h1 class="text-3xl font-bold text-gray-800">Getting Started</h1>
+          <p class="mt-2">
+            This is where you'll learn the basics of Noodl.
+          </p>
+          <h3 class="mt-6 text-lg font-bold text-gray-800">
+            The basics
+          </h3>
+          <p class="text-sm">
+            Before you start streaming, you should have a few things already figured out.
+          </p>
+          <ul class="mt-6">
+            <li class="mt-1">
+              1. Your target audience. This could be 'Software development', 'Music', or 'Business'
+            </li>
+            <li class="mt-1">
+              2. Your event's schedule.
+            </li>
+          </ul>
+          <p class="mt-6 text-sm">
+            If you have all of these down, you can jump into tailoring your event.
+          </p>
+        </div>
+
+        <div id="navigating" class="mt-6">
+          <h1 class="text-3xl font-bold text-gray-800">Navigating the dashboard</h1>
+          <p>
+            Your edit dashboard is where you'll go to customize your event.
+          </p>
+          <div class="mt-5">
+            <img class="w-full h-auto" src="<%= Routes.static_path(@socket, "/images/dash.png") %>" alt="Dashboard">
+          </div>
+          <p class="mt-5">
+            In the sidebar, you'll see links to take you to the places you need in order to tailor your event.
+          </p>
+          <p class="mt-5">
+            When your event is first created, it will be in a 'draft' state, meaning it's not visible to the public.
+            This is so that you can tweak your details as needed, and publish once you feel it's complete.
+          </p>
+          <p class="mt-5">
+            In order to publish your event, you have to do a few things.
+          </p>
+          <ul class="mt-6">
+            <li class="mt-1">
+              1. <span class="font-bold text-gray-800">Add organizers and speakers.</span> This is where you can add users without requiring them to purchase tickets. You can also assign roles to them like Organizer, Speaker, etc. on this page.
+            </li>
+            <li class="mt-1">
+              2. <span class="font-bold text-gray-800">Create your 'ticket' details.</span> You can sell tickets to attendees to make money, or you can just leave them free.
+            </li>
+            <li class="mt-1">
+              3. <span class="font-bold text-gray-800">Create sessions.</span> Sessions are like individual streams within your event. You can have as many as you want for different topics. <br />
+              You can have multiple sessions in parallel if desired, or you can just have one long session if you choose. Additionally you can configure the session so it allows "Spectators". Spectators can view the video but cannot join the chat.
+            </li>
+            <li class="mt-1">
+              4. <span class="font-bold text-gray-800">Upload your splash image.</span> This will help draw attention to your event and attract attendees.
+            </li>
+          </ul>
+          <p class="mt-6 text-sm">
+            Once all of these steps are completed, you can publish your event.
+          </p>
+          <div class="mt-5">
+            <img class="w-full h-auto" src="<%= Routes.static_path(@socket, "/images/publish.png") %>" alt="publish">
+          </div>
+        </div>
+
+        <div id="sessions" class="mt-24">
+          <h1 class="text-3xl font-bold text-gray-800">Creating sessions</h1>
+          <p>
+            Sessions are what drive your stream during your event. Have one for every topic, or stream with just one. It doesn't matter.
+          </p>
+          <div class="mt-5">
+            <img class="w-full h-auto" src="<%= Routes.static_path(@socket, "/images/sessions.png") %>" alt="Session">
+          </div>
+          <p class="mt-5">
+            You can imagine each session as its own individual stream. This is useful if you want to run a conference with multiple different speakers at a time. <br />
+            Each session gets its own individual stream key, which the host can use to stream to its audience.
+          </p>
+          <p>
+            There are a few qualities that make a session unique.
+          </p>
+          <ul class="mt-6">
+            <li class="mt-1">
+              1. <span class="font-bold text-gray-800">Chat.</span> Each session has its own individual chatroom. Organizers of the event can jump into different sessions and manage chat as needed.
+            </li>
+            <li class="mt-1">
+              2. <span class="font-bold text-gray-800">Presenters.</span> Sessions all have presenters, users that can stream to the audience. Depending on the type of session you configure you can have one or many people presenting at the same time.
+            </li>
+            <li class="mt-1">
+              3. <span class="font-bold text-gray-800">Schedule.</span> Sessions have set start and end times. You can go over the time as needed, or you can end early. The schedule is just used to inform users of the event lineup, and allows for multiple sessions to run at a time.
+            </li>
+          </ul>
+        </div>
+
+        <div id="chat" class="mt-24">
+          <h1 class="text-3xl font-bold text-gray-800">Chat usage</h1>
+          <p>
+            This is how users attending your stream will interact.
+          </p>
+          <div class="mt-5">
+            <img class="w-full h-auto" src="<%= Routes.static_path(@socket, "/images/chat.png") %>" alt="Chat">
+          </div>
+          <p class="mt-5">
+            If you click on the icon at the top right, you'll be able to see all of the attendees in the chat. Clicking the email icon beside it will allow you to direct message people in the chat.
+          </p>
+          <p class="mt-5">
+            If you are the host of a session, or an organizer of an event, you have the ability to ban / unban users from the chat as well as make them presenters (if in a video conference).
+          </p>
+          <div class="mt-5">
+            <img class="w-full h-auto" src="<%= Routes.static_path(@socket, "/images/ban.png") %>" alt="Ban">
+          </div>
+          <p class="mt-5">
+            Clicking the 'cancel' icon next to the users name above will ban the user from the chat. This will be in affect until the user is unbanned by an organizer.
+          </p>
+          <div class="mt-5">
+            <img class="w-full h-auto" src="<%= Routes.static_path(@socket, "/images/banned.png") %>" alt="Banned user">
+          </div>
+          <p class="mt-5">
+            The above user has been banned from chat, and no longer has access to post.
+          </p>
+          <p class="mt-5">
+            To unban users, simply click the 'check' icon next to the user to unban them.
+          </p>
+          <div class="mt-5">
+            <img class="w-full h-auto" src="<%= Routes.static_path(@socket, "/images/unban.png") %>" alt="Unbanning user">
+          </div>
+        </div>
+
+        <div id="streaming" class="mt-24">
+          <h1 class="text-3xl font-bold text-gray-800">How to stream</h1>
+          <p>
+            This is the view you'll see when you first enter the lobby of a keynote type session
+          </p>
+          <div class="mt-5">
+            <img class="w-full h-auto" src="<%= Routes.static_path(@socket, "/images/empty-stream.png") %>" alt="Empty Stream Panel">
+          </div>
+
+          <p class="mt-5">
+            There are four main controls. The first is "swap" which will take whatever is showing in the large backdrop and move it into the smaller picture in the right hand corner. The second is the microphone. Use this to turn your microphone on or off. The third is video which will capture your default video device and display it in a little side panel. And lastly is the screenshare button which you can use to share your entire desktop, a specific tab, or a specific application window.
+          </p>
+
+          <p class="mt-5">
+            Active buttons will turn them blue. Activating the video or screenshare buttons will turn them into stop buttons. Click stop to stop broadcasting that device to viewers of the stream.
+          </p>
+
+          <p class="mt-5">
+            This is what the stream looks like when video and screenshare are enabled.
+          </p>
+
+          <div class="mt-5">
+            <img class="w-full h-auto" src="<%= Routes.static_path(@socket, "/images/full-stream.png") %>" alt="All stream buttons turned on">
+          </div>
+
+          <p class="mt-5">
+            And this is what the stream looks like when the "swap" button is clicked.
+          </p>
+
+          <div class="mt-5">
+            <img class="w-full h-auto" src="<%= Routes.static_path(@socket, "/images/full-stream-swapped.png") %>" alt="Video and screenshare swapped">
+          </div>
+
+          <p class="mt-5">
+            Video conference type sessions look a little different on load, they are missing a lot of the statistics panels due to the fact this session type is used for talking face to face with multiple people. As more people are added as presenters they will fill the empty space above the controls.
+          </p>
+
+          <div class="mt-5">
+            <img class="w-full h-auto" src="<%= Routes.static_path(@socket, "/images/video-conference.png") %>" alt="Video Conference">
+          </div>
+        </div>
+      </div>
+  </section>
+</div>
+
+<%= render NoodlWeb.LayoutView, "_footer.html", assigns %>

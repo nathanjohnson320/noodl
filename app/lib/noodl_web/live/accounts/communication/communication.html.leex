@@ -1,0 +1,93 @@
+
+
+<section class="min-h-screen pt-16 pb-12 bg-gray-100">
+  <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 lg:flex md:justify-between">
+    <%= Phoenix.View.render NoodlWeb.AccountsView, "sidebar.html", Map.put(assigns, :view, "communication") %>
+
+    <div class="flex-1 mt-8 md:mt-0">
+      <div class="bg-white rounded-md shadow sm:overflow-hidden">
+        <header class="px-4 pt-5 bg-white sm:pt-6 sm:px-6">
+          <h1 class="text-lg font-medium leading-6 text-gray-900">
+            Notifications
+          </h1>
+          <p class="mt-1 text-sm leading-5 text-gray-500">
+            Let us know how you would like to receive notifications while using Noodl.
+          </p>
+
+          <div class="mt-4">
+            <button
+              phx-hook="PushNotifications"
+              phx-data-type="<%= if is_nil(@push_subscription), do: "enable", else: "disable" %>"
+              data-type="<%= if is_nil(@push_subscription), do: "enable", else: "disable" %>"
+              id="push-notifications-button"
+              class="inline-flex items-center px-3 py-2 text-sm font-medium leading-4 text-gray-700 transition duration-150 ease-in-out bg-gray-100 border border-transparent rounded-md hover:bg-gray-50 focus:outline-none focus:border-gray-300 focus:shadow-outline-gray active:bg-gray-200"
+            >
+              <%= if is_nil(@push_subscription) do %>
+                Enable push notifications
+              <% else %>
+                Disable Push Notifications
+              <% end %>
+            </button>
+          </div>
+        </header>
+
+        <%= f = form_for :preferences, "#", [phx_submit: :update_preferences, class: "mt-6"] %>
+          <fieldset class="px-4 pb-5 bg-white sm:px-6 sm:pb-6">
+            <legend class="text-base font-medium text-gray-900">
+              Email &amp; Push Preferences
+            </legend>
+
+            <div class="mt-4">
+              <div class="relative flex items-start">
+                <div class="absolute flex items-center h-5">
+                  <%= checkbox(f, "session_start", class: "form-checkbox h-4 w-4 transition duration-150 ease-in-out", checked: is_subscribed?(@subscriptions, "session_start")) %>
+                </div>
+                <div class="text-sm leading-5 pl-7">
+                  <%= label f, "session_start", class: "flex items-center cursor-pointer" do %>
+                    Session Start
+                  <% end %>
+                  <p class="text-gray-500">Get notified when a session starts for an event.</p>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <div class="relative flex items-start">
+                  <div class="absolute flex items-center h-5">
+                    <%= checkbox(f, "promotional", class: "form-checkbox", checked: is_subscribed?(@subscriptions, "promotional")) %>
+                  </div>
+                  <div class="text-sm leading-5 pl-7">
+                    <%= label f, "promotional", class: "flex items-center cursor-pointer" do %>
+                      Promotions
+                    <% end %>
+                    <p class="text-gray-500">Get notified for any promotions.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mt-4">
+                <div class="relative flex items-start">
+                  <div class="absolute flex items-center h-5">
+                    <%= checkbox(f, "new_events", class: "form-checkbox", checked: is_subscribed?(@subscriptions, "new_events")) %>
+                  </div>
+                  <div class="text-sm leading-5 pl-7">
+                    <%= label f, "new_events", class: "flex items-center cursor-pointer" do %>
+                      Upcoming Events
+                    <% end %>
+                    <p class="text-gray-500">We'll email you a weekly curated list of new events to check out.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="px-4 py-3 text-right bg-gray-50 sm:px-6">
+            <span class="inline-flex rounded-md shadow-sm">
+              <%= submit "Update", class: UI.button(:primary, :sm) %>
+              </span>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

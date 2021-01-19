@@ -1,0 +1,52 @@
+
+
+<section class="min-h-screen pt-16 pb-12 bg-gray-100">
+  <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8 lg:flex md:justify-between">
+    <%= Phoenix.View.render NoodlWeb.AccountsView, "sidebar.html", Map.put(assigns, :view, "security") %>
+
+    <div class="flex-1 mt-8 md:mt-0">
+      <div class="rounded-md shadow sm:overflow-hidden">
+        <div class="bg-white">
+          <header class="px-4 pt-5 sm:pt-6 sm:px-6">
+            <h1 class="text-lg font-medium leading-6 text-gray-900">
+              Security
+            </h1>
+            <p class="mt-1 text-sm leading-5 text-gray-500">
+              Keep this information secure and confidential.
+            </p>
+          </header>
+
+          <%= form_for @changeset, "#", [phx_submit: :submit, phx_change: :validate, multipart: true, class: "mt-6", autocomplete: "off", phx_ignore: "update"], fn f -> %>
+            <div class="px-4 pb-5 mt-6 sm:px-6 sm:pb-6">
+              <div class="block w-full sm:flex">
+                <%= label f, :firstname, class: "block w-full sm:w-1/2 lg:w-1/3" do %>
+                  <span class="text-sm font-medium leading-5 text-gray-700">New password</span>
+                  <%= password_input f, :password, [class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5", value: input_value(f, :password)] %>
+                  <%= if @validating and not is_nil(@changeset.errors[:password]) do %>
+                    <%= error_tag @changeset, :password, [class: "block mt-2 text-sm text-red-600"] %>
+                  <% end %>
+                <% end %>
+              </div>
+
+              <div class="block w-full mt-6 sm:flex">
+                <%= label f, :firstname, class: "block w-full sm:w-1/2 lg:w-1/3" do %>
+                  <span class="text-sm font-medium leading-5 text-gray-700">Confirm password</span>
+                  <%= password_input f, :password_confirmation, [class: "mt-1 form-input block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none transition duration-150 ease-in-out sm:text-sm sm:leading-5", value: input_value(f, :password_confirmation)] %>
+                  <%= if @validating and not is_nil(@changeset.errors[:password_confirmation]) do %>
+                    <%= error_tag @changeset, :password_confirmation, [class: "block mt-2 text-sm text-red-600"] %>
+                  <% end %>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="px-4 py-3 text-right bg-gray-50 sm:px-6">
+              <span class="inline-flex rounded-md shadow-sm">
+                <%= submit "Update", class: UI.button(:primary, :sm) %>
+              </span>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,23 @@
+<main role="main">
+  <%= if live_flash(@flash, :info) do %>
+    <p class="p-4 text-sm text-center text-gray-800 bg-red-100 alert alert-info cursor-pointer"
+       role="alert"
+       phx-click="lv:clear-flash"
+       phx-value-key="info">
+      <%= live_flash(@flash, :info) %>
+    </p>
+  <% end %>
+
+  <%= if live_flash(@flash, :error) do %>
+    <p class="p-4 text-sm text-center text-gray-800 bg-blue-100 alert alert-danger cursor-pointer"
+       role="alert"
+       phx-click="lv:clear-flash"
+       phx-value-key="error">
+      <%= live_flash(@flash, :error) %>
+    </p>
+  <% end %>
+
+  <%= live_component @socket, HeaderComponent, id: :header, user: assigns[:user] %>
+
+  <%= @inner_content %>
+</main>

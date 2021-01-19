@@ -1,0 +1,196 @@
+<div class="overflow-hidden bg-white shadow sm:rounded-lg">
+  <header class="flex items-center justify-between px-4 py-5 border-b border-gray-200 sm:px-6">
+    <div>
+      <h1 class="text-lg font-medium leading-6 text-gray-900">
+        Proposals
+      </h1>
+    </div>
+  </header>
+
+  <div>
+    <%= for proposal <- @proposals do %>
+      <div class="whitespace-no-wrap border-b border-gray-200">
+        <div role="button" tabindex="0" phx-keydown="toggle" aria-pressed="false" phx-value-id="<%= proposal.id %>" phx-click="toggle" class="flex items-center justify-between px-6 py-4 outline-none cursor-pointer hover:bg-gray-50 focus:bg-gray-50">
+          <div class="flex items-center">
+            <div class="flex-shrink-0 w-10 h-10">
+              <img class="object-cover w-10 h-10 overflow-hidden rounded-full profile-photo-thumbnail" alt="<%= proposal.user.firstname %> <%= proposal.user.lastname %> profile photo" src="<%= profile_photo_url(proposal.user) %>" />
+            </div>
+
+            <div class="ml-4">
+              <div class="text-sm font-medium leading-5 text-gray-900"><%= proposal.user.firstname %> <%= proposal.user.lastname %></div>
+              <div class="text-sm leading-5 text-gray-500"><%= proposal.user.email %></div>
+            </div>
+
+            <div class="flex items-center">
+              <%= case proposal.approved do %>
+                <% nil -> %>
+                  <span class="px-1 py-1 ml-4 text-xs text-yellow-900 bg-yellow-300 rounded">
+                    Pending
+                  </span>
+                <% true -> %>
+                  <span class="px-1 py-1 ml-4 text-xs text-red-900 bg-red-200 rounded">
+                    Approved
+                  </span>
+                <% false -> %>
+                  <span class="px-1 py-1 ml-4 text-xs text-red-900 bg-red-200 rounded">
+                    Declined
+                  </span>
+              <% end %>
+              <%= if not is_nil(proposal.session) do %>
+                <span class="px-1 py-1 ml-4 text-xs text-red-900 bg-red-200 rounded">Created</span>
+              <% end %>
+            </div>
+          </div>
+          <div>
+            <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: (if @expanded == proposal.id, do: "chevron-up", else: "chevron-down"), class: "h-4 w-4" %>
+          </div>
+        </div>
+      </div>
+
+      <%= if @expanded == proposal.id do %>
+        <div class="pt-4 pb-4 pl-4 pr-4 md:pl-20">
+          <div class="p-4 bg-gray-50">
+            <div class="pb-4 border-b border-gray-300 border-solid">
+              <h3 class="text-lg text-gray-800 ">
+                Proposal Information
+              </h3>
+              <p class="text-sm text-gray-500">
+                Proposal details and attachments
+              </p>
+            </div>
+
+            <ul class="p-0">
+              <li class="flex items-center p-4 border-b border-gray-300 border-solid">
+                <span class="w-1/3 text-sm font-semibold text-gray-500">Title</span>
+                <span class="w-2/3 text-sm text-gray-900"><%= proposal.title %></span>
+              </li>
+              <li class="flex items-center p-4 border-b border-gray-300 border-solid">
+                <span class="w-1/3 text-sm font-semibold text-gray-500">Audience</span>
+                <span class="w-2/3 text-sm text-gray-900"><%= proposal.audience %></span>
+              </li>
+              <li class="flex items-center p-4 border-b border-gray-300 border-solid">
+                <span class="w-1/3 text-sm font-semibold text-gray-500">Tags</span>
+                <span class="w-2/3 text-sm text-gray-900"><%= proposal.tags %></span>
+              </li>
+              <li class="flex items-center p-4 border-b border-gray-300 border-solid">
+                <span class="w-1/3 text-sm font-semibold text-gray-500">About</span>
+                <span class="w-2/3 text-sm text-gray-900"><%= proposal.description %></span>
+              </li>
+              <li class="flex items-center p-4 border-b border-gray-300 border-solid">
+                <span class="w-1/3 text-sm font-semibold text-gray-500">Company Name</span>
+                <span class="w-2/3 text-sm text-gray-900"><%= proposal.company_name %></span>
+              </li>
+              <li class="flex items-center p-4 border-b border-gray-300 border-solid">
+                <span class="w-1/3 text-sm font-semibold text-gray-500">Company Description</span>
+                <span class="w-2/3 text-sm text-gray-900"><%= proposal.company_description %></span>
+              </li>
+              <%= if is_nil(proposal.session) do %>
+                <li class="flex items-center justify-end p-4 border-b border-gray-300 border-solid">
+                  <div class="flex justify-between">
+                    <button
+                      class="<%= UI.button(:secondary) %> mx-5"
+                      phx-click="decision"
+                      phx-value-approval="no"
+                      phx-value-id="<%= proposal.id %>"
+                    >
+                      Decline
+                    </button>
+                    <%= if proposal.approved != true do %>
+                      <button
+                        class="<%= UI.button() %>"
+                        phx-click="decision"
+                        phx-value-approval="yes"
+                        phx-value-id="<%= proposal.id %>"
+                      >
+                        Approve
+                      </button>
+                    <% end %>
+                    <%= if proposal.approved do %>
+                      <button
+                        class="<%= UI.button() %>"
+                        phx-click="create-session"
+                        phx-value-id="<%= proposal.id %>"
+                      >
+                        Add to Schedule
+                      </button>
+                    <% end %>
+                  </div>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<%= if @creating do %>
+  <div class="fixed inset-x-0 bottom-0 px-4 pb-6 sm:inset-0 sm:p-0 sm:flex sm:items-center sm:justify-center">
+    <div phx-click="cancel" class="fixed inset-0 transition-opacity">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <div
+      style="height: 500px"
+      class="px-4 pt-5 pb-4 overflow-y-scroll transition-all transform bg-white rounded-lg shadow-xl sm:max-w-xl sm:w-full sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-headline"
+    >
+      <div>
+        <h2 class="text-lg font-medium leading-6 text-gray-900" id="modal-headline">
+          Add Session
+        </h2>
+
+        <div class="p-4 mt-4 rounded-md sm:flex bg-gray-50">
+          <div class="sm:flex-1">
+            <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">
+              Event Starts
+            </span>
+            <span class="block text-gray-900">
+              <%= pretty_manage_date(@event, @event.start_datetime) %>
+            </span>
+          </div>
+
+          <div class="mt-2 sm:mt-0 sm:flex-1">
+            <span class="text-xs font-medium tracking-wider text-gray-500 uppercase">
+              Event Ends
+            </span>
+            <span class="block text-gray-900">
+              <%= pretty_manage_date(@event, @event.end_datetime) %>
+            </span>
+          </div>
+        </div>
+
+        <%= if live_flash(@flash, :error) do %>
+          <div class="p-4 mt-4 transition-opacity duration-200 ease-in rounded-md bg-red-50">
+            <div class="flex">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium leading-5 text-red-800">
+                  <%= live_flash(@flash, :error) %>
+                </p>
+              </div>
+            </div>
+          </div>
+        <% end %>
+        <div class="mt-4">
+          <%= render NoodlWeb.SessionView, "form.html",
+            changeset: @changeset,
+            socket: @socket,
+            speakers: [],
+            event: @event,
+            validating: @validating,
+            on_submit: :submit,
+            proposal_speaker: @session.host
+          %>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

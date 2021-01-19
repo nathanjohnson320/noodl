@@ -1,0 +1,42 @@
+<div class="p-6 bg-white rounded">
+    <%= if Enum.empty?(@future_sessions) do %>
+        <h4 class="text-xl font-bold text-gray-800">This event has ended!</h4>
+        <p class="text-sm text-gray-700">Thanks for joining.</p>
+    <% else %>
+        <h4 class="text-xl font-bold text-gray-800">This session has ended!</h4>
+        <p class="text-sm text-gray-700">Please choose from these list of sessions to proceed to the next session</p>
+        <ul class="mt-2">
+            <%= for session <- @future_sessions do %>
+            <li>
+                <%= live_redirect class: "block hover:bg-gray-100 focus:outline-none focus:bg-gray-100 transition duration-150 ease-in-out", to: Routes.events_session_dashboard_path(@socket, :dashboard, @session.event.slug, session.slug) do %>
+                <div class="flex items-center py-4 sm:px-6 lg:px-2">
+                    <div class="flex items-center flex-1 min-w-0">
+                    <div class="flex-1 min-w-0 px-4 md:grid md:grid-cols-2 md:gap-4">
+                        <div>
+                        <div class="text-sm font-medium leading-5 text-red-500 truncate"><%= session.name %></div>
+                        <div class="flex items-center text-sm leading-5 text-gray-500">
+                            <span class="truncate"><%= @session.host.firstname %> <%= @session.host.lastname %></span>
+                        </div>
+                        </div>
+                        <div class="hidden md:block">
+                        <div>
+                            <div class="text-sm leading-5 text-gray-900">
+                            <span class="block text-xs font-medium tracking-wide text-gray-500 uppercase">Starts</span>
+                            <%= format_session_start_time(session, @session.event) %>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div>
+                    <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    </div>
+                </div>
+                <% end %>
+            </li>
+            <% end %>
+        </ul>
+    <% end %>
+</div>

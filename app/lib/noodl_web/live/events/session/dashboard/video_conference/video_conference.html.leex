@@ -1,0 +1,117 @@
+<div
+  class="overflow-hidden bg-gray-100 sm:flex sm:h-video-full"
+>
+  <%# Content %>
+  <div class="relative flex flex-col flex-1 w-full overflow-hidden sm:w-0">
+    <div class="relative z-0 flex-1 overflow-y-auto">
+      <%# Video %>
+      <div class="h-full">
+        <%= if @session.status != "ended" do %>
+          <%= case @session.status do %>
+            <% "ready" -> %>
+              <div class="flex items-center justify-center w-full bg-black h-125 sm:h-full">
+                <p class="text-white">Stream is about to start...</p>
+              </div>
+            <% "connected" -> %>
+              <div phx-update="ignore" class="w-full h-125 sm:h-full">
+                <div
+                  phx-hook="VideoConference"
+                  data-app-id="<%= @app_id %>"
+                  data-channel="<%= @channel_name %>"
+                  data-token="<%= @agora_token %>"
+                  data-role="<%= @role %>"
+                  data-uid="<%= @user.recording_id %>"
+                  id="session-video"
+                  class="relative flex w-full bg-black"
+                  style="height: 100%"
+                >
+                </div>
+              </div>
+            <% _ -> %>
+              <div class="relative flex items-center justify-center w-full text-2xl text-white bg-gray-500 bg-center bg-no-repeat h-125 sm:h-full" style="background-image: url(<%= cover_photo_url(@session.event) %>);">
+                <div class="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center" style="background-color: rgba(0,0,0,.7);">
+                  <div class="flex flex-col justify-center">
+                    <h4 class="text-3xl font-bold">Stream currently not live</h4>
+
+                    <%= if within_allowed_time?(@session, Timex.now(@session.event.timezone)) do %>
+                      <%= if @role == :host and @session.status != "ended" do %>
+                        <button phx-click="connected"
+                                class="<%= UI.button(:primary, :xl) %> justify-center font-bold text-3xl my-2 py-4"
+                        >
+                          Ready to start?
+                        </button>
+                      <% end %>
+                    <% else %>
+                      <h6 class="text-xl font-bold">
+                        Video conference starts at
+                        <%= pretty_time(@session.start_datetime, @session.event.timezone, @user_timezone) %></h6>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+          <% end %>
+        <% else %>
+          <section class="relative flex items-center justify-center w-full text-2xl text-white bg-gray-500 bg-center bg-no-repeat h-125 sm:h-full" style="background-image: url(<%= cover_photo_url(@session.event) %>);">
+            <div class="absolute top-0 bottom-0 left-0 right-0 flex items-center justify-center" style="background-color: rgba(0,0,0,.7);">
+              <%= Phoenix.View.render NoodlWeb.SessionView, "next_sessions.html", socket: @socket, future_sessions: @future_sessions, session: @session  %>
+            </div>
+          </section>
+        <% end %>
+
+        <div
+          class="sm:block"
+        >
+          <%# Stream Info %>
+          <div class="flex justify-between w-full px-4 mt-3">
+            <div class="ml-2">
+              <p class="text-lg font-semibold text-gray-900"><%= @session.name %></p>
+              <p class="text-gray-500"><%= @session.host.firstname %> <%= @session.host.lastname %></p>
+            </div>
+            <div>
+              <div class="inline-flex items-center">
+                <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "clock", class: "flex-shrink-0 h-4 w-4 text-gray-500" %>
+                <p class="ml-2 text-sm text-gray-800"><%= timer(@time_elapsed) %></p>
+              </div>
+            </div>
+          </div>
+
+          <%# Exp. Info %>
+          <div class="px-6 mt-8">
+            <div class="px-4 py-5 bg-gray-200 rounded-md shadow-inner">
+              <div class="flex items-center">
+                <div class="flex items-center mr-2">
+                  <img class="object-cover w-16 h-16 mx-2 rounded-full" alt="event cover photo" src="<%= cover_photo_url(@session.event) %>" />
+                </div>
+                <div>
+                  <p class="text-lg font-semibold text-gray-900"><%= @session.event.name %></p>
+                  <%= live_redirect "View Details", to: Routes.events_show_path(@socket, :show, @session.event.slug), class: "text-sm text-gray-600 hover:underline" %>
+                </div>
+                <%= if @session.status == "connected" do %>
+                  <p class="px-4 mx-2 text-red-700 uppercase bg-red-200 rounded-full">live</p>
+                <% end %>
+              </div>
+            </div>
+          </div>
+
+          <%# Event Tabs %>
+          <div class="px-4 mt-10">
+            <%= live_component @socket, EventSummary, [id: :summary, session: @session, user_timezone: @user_timezone] %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Chat %>
+  <%= live_render @socket, NoodlWeb.Live.Messaging.Chat, [
+    id: "chat-container",
+    session: %{
+      "session" => @session,
+      "user" => @user,
+      "role" => @role,
+      "channel_name" => @channel_name,
+      "user_timezone" => @user_timezone
+    }
+  ]
+  %>
+</div>

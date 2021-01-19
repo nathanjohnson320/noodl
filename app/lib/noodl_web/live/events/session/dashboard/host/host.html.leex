@@ -1,0 +1,151 @@
+
+
+<div class="w-full min-h-screen p-2 bg-gray-100">
+  <div class="flex justify-between py-4">
+    <div class="pl-4 mb-4">
+      <p class="text-lg font-semibold text-red-500"><%= @session.name %></p>
+      <%= live_redirect "Back to Event Dashboard", to: Routes.events_show_path(@socket, :show, @session.event.slug), class: "text-sm text-gray-500" %>
+    </div>
+
+    <div class="flex items-center pr-4">
+      <%= if @session.status != "ended" and within_allowed_time?(@session, Timex.now(@session.event.timezone)) do %>
+        <%= case @session.status do %>
+          <% "initialized" -> %>
+            <button phx-click="connected"
+                    class="rounded-full flex items-center bg-red-600 text-white py-3 px-6"
+                    <%= if @status_changing, do: "disabled" %>
+            >
+              Ready to stream?
+            </button>
+          <% "ready" -> %>
+            <p class="flex items-center px-6 py-3 text-white bg-yellow-400 rounded-full">
+              Pending Broadcast
+            </p>
+          <% "connected" -> %>
+            <p class="rounded-full flex items-center bg-red-500 text-white py-3 px-6">
+              Connected
+            </p>
+          <% "starting" -> %>
+            <p class="flex items-center px-6 py-3 text-white bg-yellow-400 rounded-full">
+              Stream Starting
+            </p>
+          <% "disconnected" -> %>
+            <button class="rounded-full flex items-center bg-red-600 text-white py-3 px-6"
+                    phx-click="ready"
+            >
+              Stream Disconnected
+            </button>
+          <% "ended" -> %>
+            <p class="rounded-full flex items-center bg-gray-600 text-white py-3 px-6">
+              Session Ended
+            </p>
+        <% end %>
+      <% end %>
+
+      <div class="ml-3">
+        <%= cond do %>
+          <% too_early?(@session, Timex.now(@session.event.timezone)) -> %>
+            <p class="flex items-center px-6 py-3 text-white bg-gray-600 rounded-full">
+              Too early to begin stream. Come back <%= format_session_start_time(%{start_datetime: @session.start_datetime |> Timex.shift(minutes: -30)}, @session.event) %>
+            </p>
+          <% @session.status != "ended" -> %>
+            <button phx-click="end_session" type="button" class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs leading-4 font-medium rounded text-gray-800 bg-gray-200 hover:bg-gray-50 focus:outline-none focus:border-gray-300 focus:shadow-outline-gray active:bg-gray-200 transition ease-in-out duration-150">
+              End Session
+            </button>
+          <% true -> %>
+            <%= content_tag :p, "Session Ended", class: "rounded-full flex items-center bg-gray-600 text-white py-3 px-6" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="block md:flex">
+    <div class="w-1/6">
+      <div class="pb-2">
+        <div class="px-4 py-2 bg-white rounded shadow" style="min-height: 100px;">
+          <%= if @session.status == "ended" do %>
+            <p class="text-sm text-gray-500">Session</p>
+            <p class="text-lg font-semibold">Ended</p>
+          <% else %>
+            <p class="text-sm text-gray-500">Time Left</p>
+            <p id="countdown-timer" class="text-2xl font-semibold" data-time="<%= @time_left %>" phx-update="ignore" phx-hook="Countdown">-</p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="pb-2">
+        <div class="px-4 py-2 bg-white rounded shadow" style="min-height: 100px;">
+          <p class="text-sm text-gray-500">Viewers</p>
+          <p class="text-2xl font-semibold"><%= @viewer_count %></p>
+        </div>
+      </div>
+
+      <div class="pb-2">
+        <div class="px-4 py-2 bg-white rounded shadow" style="min-height: 100px;">
+          <p class="text-sm text-gray-500">Stream Settings</p>
+        </div>
+      </div>
+
+      <div>
+        <div class="overflow-y-scroll bg-white rounded shadow" style="height: 315px;">
+          <p class="px-4 py-2 border-b border-gray-300 border-solid">Activity Feed</p>
+          <ul id="activities" class="p-2 mb-2" phx-update="append">
+            <%= for activity <- @activities do %>
+              <li class="pl-2 mb-2 text-xs font-semibold text-gray-800 truncate cursor-pointer" id="<%= activity.id %>" title="<%= activity.content %>">
+                <span class="pr-1 text-xs text-gray-400"><%= pretty_activity_time(activity.inserted_at, @user_timezone) %></span>
+                <%= activity.content %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-full ml-2 mr-2 lg:w-full" style="max-height: 639px;">
+      <div class="flex flex-col h-full bg-black rounded shadow">
+        <p class="px-4 py-2 bg-white border-b border-gray-200">Stream Preview</p>
+        <%= if @session.status != "ended" do %>
+          <div class="h-full">
+            <div phx-update="ignore" class="w-full" style="height: 100%">
+              <div
+                id="keynote-host"
+                phx-hook="KeynoteHost"
+                data-app-id="<%= @app_id %>"
+                data-channel="<%= @channel_name %>"
+                data-token-primary="<%= @agora_primary_token %>"
+                data-token-secondary="<%= @agora_secondary_token %>"
+                data-capability="<%= @capability %>"
+              >
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <section class="flex items-center justify-center w-full h-full">
+            <%= Phoenix.View.render NoodlWeb.SessionView, "next_sessions.html", socket: @socket, future_sessions: @future_sessions, session: @session  %>
+          </section>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="relative" style="max-height: 639px;">
+      <%= live_render @socket, NoodlWeb.Live.Messaging.Chat, [
+        id: "chat-container",
+        session: %{
+          "session" => @session,
+          "user" => @user,
+          "role" => @role,
+          "channel_name" => @channel_name,
+          "user_timezone" => @user_timezone
+        },
+        container: {:div, class: "h-full"}
+      ]
+      %>
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <%= live_component @socket, EventSummary, id: :summary, session: @session, user_timezone: @user_timezone %>
+</div>
+
+

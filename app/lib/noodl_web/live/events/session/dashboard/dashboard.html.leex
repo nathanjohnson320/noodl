@@ -1,0 +1,17 @@
+<%= case @session.type do
+  "keynote" ->
+    module = if @role == :host do
+      NoodlWeb.Live.Events.Session.Dashboard.Host
+    else
+      NoodlWeb.Live.Events.Session.Dashboard.Viewer
+    end
+
+    live_render @socket, module, id: "events_dashboard", session: %{
+      "user" => @user, "session" => @session, "role" => @role, "user_timezone" => @user_timezone
+    }
+  "video_conference" ->
+    live_render @socket, NoodlWeb.Live.Events.Session.Dashboard.VideoConference, id: "events_dashboard", session: %{
+      "user" => @user, "session" => @session, "role" => @role, "user_timezone" => @user_timezone
+    }
+end
+%>

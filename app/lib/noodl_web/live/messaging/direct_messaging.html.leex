@@ -1,0 +1,37 @@
+<div class="absolute inset-0 z-50 w-full p-2 overflow-y-scroll bg-white divide-y divide-red-200">
+  <header class="px-6 py-2">
+    <div class="flex items-start justify-between space-x-3">
+      <h2 class="text-lg leading-7 font-medium text-gray-900">
+        Direct Messages
+      </h2>
+    </div>
+  </header>
+
+  <ul class="divide-y divide-gray-200 overflow-y-auto">
+    <%= for user <- @users do %>
+      <li class="px-6 py-5 relative">
+        <div class="group flex justify-between items-center space-x-2">
+          <button type="button" class="-m-1 p-1 block w-full" phx-click="direct_message" phx-value-user="<%= user.id %>">
+            <span class="absolute inset-0 group-hover:bg-gray-50"></span>
+            <div class="flex-1 flex items-center min-w-0 relative">
+              <span class="flex-shrink-0 inline-block relative">
+                <img class="h-10 w-10 rounded-full" src="<%= profile_photo_url(user)  %>"
+                     alt="<%= get_username(user) <> "Profile photo" %>">
+              </span>
+              <div class="ml-4 truncate">
+                <div class="text-sm leading-5 font-medium text-gray-900 truncate">
+                  <%= get_username(user) %>
+                </div>
+                <%= if not is_nil(user[:social_username]) do %>
+                  <div class="text-sm leading-5 text-gray-500 truncate">
+                    <%= user.social_username %>
+                  </div>
+                <% end %>
+              </div>
+            </div>
+          </button>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</div>

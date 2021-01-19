@@ -1,0 +1,73 @@
+<div class="absolute inset-x-0 flex flex-col-reverse w-full p-2 overflow-y-scroll break-words" style="bottom: 70px; top: 1px;">
+  <div id="messages" phx-update="append" phx-hook="MessageDeleter" data-session-id="<%= @session.id %>">
+    <div id="welcome" class="w-full mb-2 text-sm text-gray-600 break-words">
+      Welcome to the chat!
+    </div>
+
+    <%= for message <- @messages do %>
+      <%= if is_organizer?(message, @organizers) do %>
+        <div class="w-full mb-2" id="<%= message.id %>" data-message>
+          <div>
+            <div class="flex items-center w-full text-sm font-semibold">
+              <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "microphone", class: "mr-1 h-4 w-4 text-red-500" %>
+              <%= get_username(message.user) %>
+              <span class="pl-1 text-xs font-thin text-gray-600">- <%= format_time(message.inserted_at, @user_timezone) %></span>
+            </div>
+            <div
+              class="flex flex-wrap items-center mt-1 text-sm text-gray-600"
+              id="<%= message.id %>-content"
+              phx-hook="Unfurler" phx-update="ignore"
+              data-url="<%= Application.get_env(:waffle, :asset_host, "") %>"
+            >
+              <%= message.content %>
+            </div>
+          </div>
+        </div>
+      <% else %>
+        <div class="w-full mb-2" id="<%= message.id %>" data-message>
+          <div>
+            <div class="flex items-center w-full text-sm font-semibold">
+              <%= get_username(message.user) %>
+              <span class="pt-1 pl-1 text-xs font-thin text-gray-500">- <%= format_time(message.inserted_at, @user_timezone) %></span>
+              <%= if is_organizer?(%{user_id: @user.id}, @organizers) do %>
+                <span class="pt-1 pl-2 text-xs text-red-400 cursor-pointer" data-message-id="<%= message.id %>">
+                  <%= render NoodlWeb.SharedView, "_hero_icon.html", icon: "trash", class: "h-4 w-4" %>
+                </span>
+              <% end %>
+            </div>
+            <div class="flex flex-wrap items-center mt-1 text-sm text-gray-600" id="<%= message.id %>-content" phx-hook="Unfurler" phx-update="ignore">
+              <%= message.content %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<%# Message Input %>
+<div class="absolute bottom-0 left-0 z-30 flex flex-shrink-0 w-full bg-white border-t border-gray-200">
+  <%= if !is_nil(@is_user_banned) do %>
+    <div class="p-4 w-full text-xs font-semibold text-red-800 bg-red-100">
+      You are banned from posting to chat.
+    </div>
+  <% else %>
+    <%= form_for @message_changeset, "#", [phx_submit: :submit_message, class: "flex sm:block w-full py-2 pr-2", autocomplete: :off ], fn f -> %>
+      <%=
+      textarea f, :content, [
+        id: "chat",
+        phx_hook: "ChatInput",
+        placeholder: "Type to chat...",
+        class: "form-input text-gray-700 text-xs sm:text-sm rounded h-full p-1 sm:p-2 w-full bg-gray-100 outline-none resize-none",
+        value: @message_changeset.changes[:content],
+        autocapitalize: "none"
+      ]
+      %>
+      <div class="block ml-2 sm:ml-0 sm:absolute sm:top-0 sm:invisible">
+        <%= submit [class: "block px-3 font-semibold rounded text-xs py-1 bg-red-500 text-white"]  do %>
+          Send
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

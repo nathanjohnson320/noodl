@@ -1,0 +1,9 @@
+Noodl TV
+==================================
+
+<%= @inner_content %>
+==================================
+
+ABOUT
+Noodl aims to make remote events delightfully simple.
+Copyright © 2020

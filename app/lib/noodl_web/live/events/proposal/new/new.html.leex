@@ -1,0 +1,26 @@
+
+
+<div class="w-full h-full pt-12 pb-12 bg-gray-100">
+  <div class="max-w-screen-lg m-auto bg-white rounded shadow">
+    <%= if live_flash(@flash, :info) do %>
+      <div class="p-4 mb-4 text-red-700 bg-red-100 border-l-4 border-red-500" role="alert">
+        <%= live_flash(@flash, :info) %>
+      </div>
+    <% end %>
+    <div class="p-6">
+      <h2 class="text-2xl font-bold text-gray-800">New Proposal for <%= @event.name %></h2>
+      <p class="text-gray-500">Give us some information about your proposal.</h2>
+    </div>
+
+    <div class="pl-6 mt-4 mb-6">
+      <h3 class="text-xl font-bold text-gray-800">About</h3>
+      <p class="text-gray-500">General information about your proposal.</h2>
+    </div>
+
+    <div class="p-6">
+      <%= Phoenix.View.render NoodlWeb.ProposalView, "form.html", assigns %>
+    </div>
+  </div>
+</div>
+
+<%= Phoenix.View.render NoodlWeb.LayoutView, "_footer.html", assigns %>

@@ -1,0 +1,5 @@
+Welcome to Noodl!
+
+<%= full_url(Routes.accounts_path(NoodlWeb.Endpoint, :confirmation, token: @token)) %>
+
+

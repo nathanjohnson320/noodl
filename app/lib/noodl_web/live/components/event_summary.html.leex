@@ -1,0 +1,55 @@
+<div>
+  <div class="flex">
+    <%= for tab <- @tabs do %>
+      <p class="px-4 py-2 cursor-pointer <%= tab_selected(assigns, tab) %> rounded-lg" phx-target="<%= @myself %>" phx-click="change_tab" phx-value-tab="<%= tab %>">
+        <%= String.capitalize(tab) %>
+      </p>
+    <% end %>
+  </div>
+
+  <div class="w-full my-2">
+    <div class="p-4 bg-white rounded-lg shadow">
+    <%= case @current_tab do %>
+      <% "sponsors" -> %>
+        <div class="flex flex-wrap justify-between w-full">
+          <%= if Enum.empty?(@event.sponsors) do %>
+            <p class="text-gray-500">No sponsors have backed this event.</p>
+          <% end %>
+          <%= for sponsor <- @event.sponsors do %>
+            <div class="flex items-center justify-center w-1/2 p-4 bg-gray-100 border border-white">
+              <img
+                class="w-36"
+                alt="<%= sponsor.name %>"
+                src="<%= sponsor_photo_url(sponsor) %>"
+              />
+            </div>
+          <% end %>
+        </div>
+      <% "about" -> %>
+        <p class="text-gray-500 whitespace-pre-line">
+          <%= if assigns[:session], do: NoodlWeb.LiveHelpers.render_markdown(@session.description), else: NoodlWeb.LiveHelpers.render_markdown(@event.description) %>
+        </p>
+      <% "speakers" -> %>
+        <div class="flex flex-wrap justify-between w-full">
+          <%= if Enum.empty?(@speakers) do %>
+            <p class="text-gray-500">No speakers have signed up for this event.</p>
+          <% end %>
+          <%= for speaker <- @speakers do %>
+            <div class="flex items-center w-1/2 p-4">
+              <img
+                class="w-24 rounded-full"
+                alt="<%= speaker.firstname %> profile photo"
+                src="<%= if not is_nil(speaker.social_link), do: gravatar_url(speaker), else: profile_photo_url(speaker) %>"
+              >
+              <div class="px-4">
+                <p class="font-semibold"><%= speaker.firstname %> <%= speaker.lastname %></p>
+                <a class="text-sm" href="<%= speaker.social_link %>"><%= speaker.social_username %></a>
+              </div>
+            </div>
+          <% end %>
+        </div>
+        <% "schedule" -> %>
+          <%= Phoenix.View.render NoodlWeb.EventsView, "schedule_partial.html", event: @event, sessions: @sessions, should_route: true, socket: @socket, user_timezone: @user_timezone %>
+    <% end %>
+  </div>
+</div>

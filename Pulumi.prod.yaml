@@ -1,0 +1,32 @@
+config:
+  aws:region: us-east-1
+  noodl-tv:AGORA_APP_ID:
+    secure: AAABAPtmLfWb6LSeidRj1O/7gmD3Q9Ci7H005avwB0JUE3Oc+kAV5AZ5oD2/4/UUJ3h8z43TDHIP7vjwaJP1NA==
+  noodl-tv:AGORA_APP_ID=1bb8244fa8ad4fb1a3cd491586a7ed58:
+    secure: AAABAMiH63TzO8Nrx2SB2Ytvq3mPy2NhdID7fy0YVf33y32lLqexSJxm4G7JxVltSN/hFBW3DGJtOOe6a3g6Tw==
+  noodl-tv:AGORA_CERT: 2115a3c37adb4154ae5e2d247f91d6b9
+  noodl-tv:MAILGUN_API_KEY:
+    secure: AAABAP0nrqpJnVgx1ZAa6nSx8LmOzG+MGcmWrQwTThlBddjqaq6IZF1QKMqQiLhGftZepW4Nv851LrKyOBao6VP7EcIk22Fkl8e6LKn09MlmbA==
+  noodl-tv:MAILGUN_DOMAIN:
+    secure: AAABAJsSi10WFSh2Wyb44tZC6jSwnsFoq9iPunwhL1QhZ5OO+2M6D6za+A==
+  noodl-tv:S3_READ_ACCESS_KEY:
+    secure: AAABAEVtw3WjnzFqNYWaktXDCmryUisfEPQBYA81pI6fa0TS2YIyKMlAZWyedJSZKtouRA==
+  noodl-tv:S3_READ_ACCESS_SECRET:
+    secure: AAABAPka2hnB5D7Ybd/3Cqqd2wrg2pWvWVgOmyzJLTChiP+R3wbzeK8Oq4xLqZDvvLPPRv2BnGUa+6pOeKJ8yfq34Eo2dzxH
+  noodl-tv:SECRET_KEY_BASE:
+    secure: AAABAG1RvEAL4EWu4EECsWR2qDpLYkzxagXPhTdwXYwPdtBoEgvQPNK+dgwZjamexEzmU9M/Fl9lme6cMvp7h7ss4wUYsgA2fRyMRORVsaoCkrHFl+++qoeoxCGoDx3X
+  noodl-website:AGORA_APP_ID:
+    secure: AAABAKpRkyksbxQQ+yo3lg8Mv232yGvq/trarARu+ZWBBYSw/UUhyHHDHTa3rH0s0fDrq+mwNmIltLdjFrJ05g==
+  noodl-website:AGORA_CERT:
+    secure: AAABAH3dm8xBDmdAJ+bMprqha5cmSOcugsQ8uNjZYOfbLm1WG7NxY9m9AQzNFUrmnUVsozkvqbL7/XCkI631nA==
+  noodl-website:MAILGUN_API_KEY:
+    secure: AAABANNEGE4fFRptR1roVvobqjwVzglZeIYXkCSoawX+LVr1u7rwH70I1Ae4VgbZH4Ex0GIUEty60D/tMGkOpFPHybxJLSvnhD1rlWwM7VX0Jg==
+  noodl-website:MAILGUN_DOMAIN:
+    secure: AAABAJB+FUoIlrnntB8fu/5nW5X8oi0MwsGHw903L1/u07zZKo2f/dIOIA==
+  noodl-website:S3_READ_ACCESS_KEY:
+    secure: AAABALidZzSJmex4cTbSBQXndkqmLwqNx2lAk10J8TZ+9gGKMDJZSKOde5VaH6qny0hJMQ==
+  noodl-website:S3_READ_ACCESS_SECRET:
+    secure: AAABALto1+2+Ulnj9w6Kv1QiZhrlCjAmqWw6YWyxYWoplPV3ncwrpt1IQYwBSO+0FcNpyg7+hQT0U1lPwmfwXYEJzxtspKmH
+  noodl-website:SECRET_KEY_BASE:
+    secure: AAABAHhtYTp/J3G8ld6/u2HeZSJbH9AGwR5uh6nCNAvHevV2UHHsKCT98UHHNfViAR0REaAWpKsXfRZB2k01c/6VpvxpVzF8YPxxL2iEDi35kQox2ZqSDmbGi1vpZC3W
+  noodl-website:targetDomain: app.noodl.tv
